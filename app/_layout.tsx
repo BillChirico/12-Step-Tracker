@@ -18,19 +18,15 @@ function RootLayoutNav() {
     const inAuthScreen = segments[0] === 'login' || segments[0] === 'signup';
 
     if (!user && inAuthGroup) {
-      // Not logged in but trying to access protected routes
       router.replace('/login');
-    } else if (user && !profile) {
-      // User exists but profile not loaded yet - should go to onboarding
-      router.replace('/onboarding');
-    } else if (user && profile && !profile.role) {
-      // User has profile but hasn't completed onboarding
-      if (!inOnboarding) {
-        router.replace('/onboarding');
-      }
-    } else if (user && profile && profile.role && !inAuthGroup && !inOnboarding && !inAuthScreen) {
-      // User is fully set up but not in main app
+    } else if (!user && !inAuthScreen) {
+      router.replace('/login');
+    } else if (user && profile && profile.role && (inAuthScreen || inOnboarding)) {
       router.replace('/(tabs)');
+    } else if (user && profile && !profile.role && !inOnboarding) {
+      router.replace('/onboarding');
+    } else if (user && !profile && !inOnboarding) {
+      router.replace('/onboarding');
     }
   }, [user, profile, segments, loading]);
 
