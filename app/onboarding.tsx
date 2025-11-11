@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert, Platform, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -10,25 +10,35 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function OnboardingScreen() {
   const { theme } = useTheme();
+  const { user, profile, refreshProfile } = useAuth();
   const [step, setStep] = useState(1);
+  const [firstName, setFirstName] = useState('');
+  const [lastInitial, setLastInitial] = useState('');
   const [role, setRole] = useState<UserRole>('sponsee');
   const [sobrietyDate, setSobrietyDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { user, refreshProfile } = useAuth();
   const router = useRouter();
+  const needsName = profile?.first_name === 'User' || !profile?.first_name;
 
   const handleComplete = async () => {
     if (!user) return;
 
     setLoading(true);
     try {
+      const updateData: any = {
+        role,
+        sobriety_date: sobrietyDate.toISOString().split('T')[0],
+      };
+
+      if (needsName && firstName && lastInitial) {
+        updateData.first_name = firstName;
+        updateData.last_initial = lastInitial.toUpperCase();
+      }
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          role,
-          sobriety_date: sobrietyDate.toISOString().split('T')[0],
-        })
+        .update(updateData)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -36,7 +46,11 @@ export default function OnboardingScreen() {
       await refreshProfile();
       router.replace('/(tabs)');
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to update profile');
+      if (Platform.OS === 'web') {
+        window.alert('Error: ' + (error.message || 'Failed to update profile'));
+      } else {
+        Alert.alert('Error', error.message || 'Failed to update profile');
+      }
     } finally {
       setLoading(false);
     }
@@ -53,12 +67,61 @@ export default function OnboardingScreen() {
 
   const styles = createStyles(theme);
 
-  if (step === 1) {
+  if (step === 1 && needsName) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.content}>
           <Text style={styles.title}>Welcome to 12-Step Tracker</Text>
-          <Text style={styles.subtitle}>Let's set up your recovery journey</Text>
+          <Text style={styles.subtitle}>Let&apos;s get to know you</Text>
+
+          <View style={styles.nameContainer}>
+            <Text style={styles.sectionTitle}>What&apos;s your name?</Text>
+            <Text style={styles.sectionSubtitle}>We only ask for your first name and last initial to protect your privacy.</Text>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>First Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="John"
+                placeholderTextColor={theme.textTertiary}
+                value={firstName}
+                onChangeText={setFirstName}
+                autoCapitalize="words"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Last Initial</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="D"
+                placeholderTextColor={theme.textTertiary}
+                value={lastInitial}
+                onChangeText={(text) => setLastInitial(text.toUpperCase())}
+                maxLength={1}
+                autoCapitalize="characters"
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, (!firstName || !lastInitial || lastInitial.length !== 1) && styles.buttonDisabled]}
+            onPress={() => setStep(2)}
+            disabled={!firstName || !lastInitial || lastInitial.length !== 1}
+          >
+            <Text style={styles.buttonText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    );
+  }
+
+  if (step === 2 || (step === 1 && !needsName)) {
+    return (
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.content}>
+          <Text style={styles.title}>Welcome to 12-Step Tracker</Text>
+          <Text style={styles.subtitle}>Let&apos;s set up your recovery journey</Text>
 
           <View style={styles.roleContainer}>
             <Text style={styles.sectionTitle}>What is your role?</Text>
@@ -117,7 +180,7 @@ export default function OnboardingScreen() {
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => setStep(2)}
+            onPress={() => needsName ? setStep(3) : setStep(2)}
           >
             <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
@@ -190,7 +253,7 @@ export default function OnboardingScreen() {
         <View style={styles.buttonGroup}>
           <TouchableOpacity
             style={styles.secondaryButton}
-            onPress={() => setStep(1)}
+            onPress={() => needsName ? setStep(2) : setStep(1)}
             disabled={loading}
           >
             <Text style={styles.secondaryButtonText}>Back</Text>
@@ -240,8 +303,38 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontSize: 18,
     fontFamily: theme.fontRegular,
     fontWeight: '600',
-    color: '#374151',
-    marginBottom: 16,
+    color: theme.text,
+    marginBottom: 8,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    color: theme.textSecondary,
+    marginBottom: 24,
+    lineHeight: 20,
+  },
+  nameContainer: {
+    marginBottom: 32,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 8,
+  },
+  input: {
+    backgroundColor: theme.card,
+    borderWidth: 2,
+    borderColor: theme.border,
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: theme.text,
   },
   roleContainer: {
     marginBottom: 32,
