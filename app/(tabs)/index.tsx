@@ -13,10 +13,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
 import { SponsorSponseeRelationship, Task, Profile } from '@/types/database';
-import { Heart, CheckCircle, Users, Award, UserMinus, Plus , BookOpen, ClipboardList } from 'lucide-react-native';
+import {
+  Heart,
+  CheckCircle,
+  Users,
+  Award,
+  UserMinus,
+  Plus,
+  BookOpen,
+  ClipboardList,
+} from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import TaskCreationModal from '@/components/TaskCreationModal';
-
 
 export default function HomeScreen() {
   const { profile } = useAuth();
