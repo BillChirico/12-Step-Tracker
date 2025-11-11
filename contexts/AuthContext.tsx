@@ -110,8 +110,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: email,
         first_name: firstName,
         last_initial: lastInitial.toUpperCase(),
-        role: 'sponsee',
-        sobriety_date: new Date().toISOString().split('T')[0],
       });
       if (profileError) throw profileError;
     }

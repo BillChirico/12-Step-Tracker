@@ -10,8 +10,8 @@ export interface Profile {
   last_initial: string;
   phone?: string;
   avatar_url?: string;
-  role: UserRole;
-  sobriety_date: string;
+  role?: UserRole;
+  sobriety_date?: string;
   bio?: string;
   timezone: string;
   notification_preferences: {
