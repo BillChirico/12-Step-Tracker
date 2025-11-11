@@ -25,15 +25,16 @@ This guide will help you set up the 12-Step Tracker application for local develo
    - Download from [nodejs.org](https://nodejs.org/)
    - Verify installation: `node --version`
 
-2. **npm** (comes with Node.js)
-   - Verify installation: `npm --version`
+2. **pnpm** (package manager)
+   - Install: `npm install -g pnpm`
+   - Verify installation: `pnpm --version`
 
 3. **Git**
    - Download from [git-scm.com](https://git-scm.com/)
    - Verify installation: `git --version`
 
 4. **Expo CLI**
-   - Install globally: `npm install -g expo-cli`
+   - Install globally: `pnpm add -g expo-cli`
    - Verify installation: `expo --version`
 
 ### Mobile Development (Optional)
@@ -69,7 +70,7 @@ cd 12-Step-Tracker
 ### 2. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 This will install all required packages including:
@@ -81,7 +82,7 @@ This will install all required packages including:
 ### 3. Verify Installation
 
 ```bash
-npm run typecheck
+pnpm typecheck
 ```
 
 Should complete without errors.
@@ -162,7 +163,7 @@ The project includes SQL migrations in `supabase/migrations/`. You need to run t
 
 1. Install Supabase CLI:
    ```bash
-   npm install -g supabase
+   pnpm add -g supabase
    ```
 
 2. Link to your project:
@@ -227,7 +228,7 @@ Summary:
 ### Start Development Server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Or using the full command:
@@ -243,7 +244,7 @@ This starts the Metro bundler and shows a QR code.
 
 ```bash
 # Press 'w' in terminal, or
-npm run build:web
+pnpm build:web
 ```
 
 Opens in your default browser at `http://localhost:8081`
@@ -400,7 +401,7 @@ export default function MyScreen() {
 Run TypeScript type checker:
 
 ```bash
-npm run typecheck
+pnpm typecheck
 ```
 
 Fix any type errors before committing.
@@ -410,13 +411,13 @@ Fix any type errors before committing.
 Run ESLint:
 
 ```bash
-npm run lint
+pnpm lint
 ```
 
 Auto-fix issues:
 
 ```bash
-npm run lint -- --fix
+pnpm lint -- --fix
 ```
 
 ---
@@ -426,7 +427,7 @@ npm run lint -- --fix
 ### Web Build
 
 ```bash
-npm run build:web
+pnpm build:web
 ```
 
 Output in `dist/` directory. Deploy to any static hosting service.
@@ -439,7 +440,7 @@ Uses EAS (Expo Application Services).
 
 1. Install EAS CLI:
    ```bash
-   npm install -g eas-cli
+   pnpm add -g eas-cli
    ```
 
 2. Log in to Expo:
@@ -509,7 +510,7 @@ See [Expo EAS documentation](https://docs.expo.dev/build/introduction/) for more
 #### Issue: "Cannot connect to Metro bundler"
 
 **Solution**:
-1. Ensure dev server is running (`npm run dev`)
+1. Ensure dev server is running (`pnpm dev`)
 2. Check firewall settings
 3. Try clearing cache: `npx expo start -c`
 
@@ -520,7 +521,7 @@ See [Expo EAS documentation](https://docs.expo.dev/build/introduction/) for more
 2. Reinstall dependencies:
    ```bash
    rm -rf node_modules
-   npm install
+   pnpm install
    ```
 
 #### Issue: "Supabase connection error"
@@ -665,7 +666,7 @@ Use clear, descriptive commit messages.
 
 After completing setup:
 
-1. ✅ Run the app: `npm run dev`
+1. ✅ Run the app: `pnpm dev`
 2. ✅ Create a test account
 3. ✅ Explore the codebase
 4. ✅ Read API documentation
