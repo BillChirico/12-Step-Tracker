@@ -1,24 +1,29 @@
 import { Tabs } from 'expo-router';
 import { Home, BookOpen, CheckSquare, MessageCircle, User } from 'lucide-react-native';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
+  const { theme } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10b981',
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textTertiary,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: theme.surface,
           borderTopWidth: 1,
-          borderTopColor: '#e5e7eb',
-          height: 60,
-          paddingBottom: 8,
+          borderTopColor: theme.border,
+          height: Platform.OS === 'web' ? 70 : 'auto',
+          paddingBottom: Platform.OS === 'web' ? 12 : 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
+          marginBottom: Platform.OS === 'web' ? 4 : 0,
         },
       }}
     >
