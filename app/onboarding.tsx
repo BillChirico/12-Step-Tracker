@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -28,6 +28,9 @@ export default function OnboardingScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const needsName = profile?.first_name === 'User' || !profile?.first_name;
+
+  // Ref for field navigation
+  const lastInitialRef = useRef<TextInput>(null);
 
   const handleComplete = async () => {
     if (!user) return;
@@ -94,12 +97,16 @@ export default function OnboardingScreen() {
                 value={firstName}
                 onChangeText={setFirstName}
                 autoCapitalize="words"
+                returnKeyType="next"
+                onSubmitEditing={() => lastInitialRef.current?.focus()}
+                blurOnSubmit={false}
               />
             </View>
 
             <View style={styles.inputContainer}>
               <Text style={styles.label}>Last Initial</Text>
               <TextInput
+                ref={lastInitialRef}
                 style={styles.input}
                 placeholder="D"
                 placeholderTextColor={theme.textTertiary}
@@ -107,6 +114,8 @@ export default function OnboardingScreen() {
                 onChangeText={text => setLastInitial(text.toUpperCase())}
                 maxLength={1}
                 autoCapitalize="characters"
+                returnKeyType="done"
+                onSubmitEditing={() => setStep(2)}
               />
             </View>
           </View>

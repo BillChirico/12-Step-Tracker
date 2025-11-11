@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -45,6 +45,9 @@ export default function LoginScreen() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { signIn, signInWithGoogle } = useAuth();
   const router = useRouter();
+
+  // Refs for field navigation
+  const passwordRef = useRef<TextInput>(null);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -112,18 +115,24 @@ export default function LoginScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <TextInput
+              ref={passwordRef}
               style={styles.input}
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               editable={!loading}
+              returnKeyType="done"
+              onSubmitEditing={handleLogin}
             />
           </View>
 

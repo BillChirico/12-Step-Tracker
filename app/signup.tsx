@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -48,6 +48,12 @@ export default function SignupScreen() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { signUp, signInWithGoogle } = useAuth();
   const router = useRouter();
+
+  // Refs for field navigation
+  const lastInitialRef = useRef<TextInput>(null);
+  const emailRef = useRef<TextInput>(null);
+  const passwordRef = useRef<TextInput>(null);
+  const confirmPasswordRef = useRef<TextInput>(null);
 
   const handleSignup = async () => {
     if (!firstName || !lastInitial || !email || !password || !confirmPassword) {
@@ -152,12 +158,16 @@ export default function SignupScreen() {
               value={firstName}
               onChangeText={setFirstName}
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => lastInitialRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Last Initial</Text>
             <TextInput
+              ref={lastInitialRef}
               style={styles.input}
               placeholder="D"
               value={lastInitial}
@@ -165,12 +175,16 @@ export default function SignupScreen() {
               maxLength={1}
               autoCapitalize="characters"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => emailRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
             <TextInput
+              ref={emailRef}
               style={styles.input}
               placeholder="your@email.com"
               value={email}
@@ -178,30 +192,40 @@ export default function SignupScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => passwordRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <TextInput
+              ref={passwordRef}
               style={styles.input}
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               editable={!loading}
+              returnKeyType="next"
+              onSubmitEditing={() => confirmPasswordRef.current?.focus()}
+              blurOnSubmit={false}
             />
           </View>
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Confirm Password</Text>
             <TextInput
+              ref={confirmPasswordRef}
               style={styles.input}
               placeholder="••••••••"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
               editable={!loading}
+              returnKeyType="done"
+              onSubmitEditing={handleSignup}
             />
           </View>
 

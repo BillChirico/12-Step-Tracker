@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -847,6 +847,8 @@ export default function ProfileScreen() {
                   autoCapitalize="characters"
                   maxLength={8}
                   editable={!isConnecting}
+                  returnKeyType="done"
+                  onSubmitEditing={joinWithInviteCode}
                 />
                 <TouchableOpacity
                   style={[styles.inviteSubmitButton, isConnecting && styles.buttonDisabled]}
