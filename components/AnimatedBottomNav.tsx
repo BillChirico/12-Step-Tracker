@@ -109,7 +109,7 @@ export default function AnimatedBottomNav({
 
   const handleTextLayout = (index: number) => (event: LayoutChangeEvent) => {
     const { width } = event.nativeEvent.layout;
-    setTextWidths((prev) => {
+    setTextWidths(prev => {
       const newWidths = [...prev];
       newWidths[index] = width;
       return newWidths;
@@ -118,7 +118,7 @@ export default function AnimatedBottomNav({
 
   const styles = useMemo(
     () => createStyles(theme, finalAccentColor, isDark),
-    [theme, finalAccentColor, isDark],
+    [theme, finalAccentColor, isDark]
   );
 
   return (
@@ -150,9 +150,7 @@ export default function AnimatedBottomNav({
               >
                 <IconComponent
                   size={24}
-                  color={
-                    isActive ? finalAccentColor : styles.inactiveColor.color
-                  }
+                  color={isActive ? finalAccentColor : styles.inactiveColor.color}
                 />
               </Animated.View>
 
