@@ -7,7 +7,7 @@ import { User, LogOut, Heart, Calendar, Share2, QrCode, Bell, Moon, Sun, Monitor
 
 export default function ProfileScreen() {
   const { profile, signOut, refreshProfile } = useAuth();
-  const { themeMode, setThemeMode } = useTheme();
+  const { theme, themeMode, setThemeMode } = useTheme();
   const [inviteCode, setInviteCode] = useState('');
   const [showInviteInput, setShowInviteInput] = useState(false);
   const [notificationSettings, setNotificationSettings] = useState({
@@ -149,6 +149,8 @@ export default function ProfileScreen() {
     }
   };
 
+  const styles = createStyles(theme);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -218,7 +220,7 @@ export default function ProfileScreen() {
 
         <View style={styles.settingsCard}>
           <View style={styles.settingRow}>
-            <Monitor size={20} color="#6b7280" />
+            <Monitor size={20} color={theme.textSecondary} />
             <Text style={styles.settingLabel}>Appearance</Text>
           </View>
 
@@ -227,7 +229,7 @@ export default function ProfileScreen() {
               style={[styles.themeOption, themeMode === 'light' && styles.themeOptionSelected]}
               onPress={() => setThemeMode('light')}
             >
-              <Sun size={20} color={themeMode === 'light' ? '#10b981' : '#6b7280'} />
+              <Sun size={20} color={themeMode === 'light' ? theme.primary : theme.textSecondary} />
               <Text style={[styles.themeOptionText, themeMode === 'light' && styles.themeOptionTextSelected]}>
                 Light
               </Text>
@@ -237,7 +239,7 @@ export default function ProfileScreen() {
               style={[styles.themeOption, themeMode === 'dark' && styles.themeOptionSelected]}
               onPress={() => setThemeMode('dark')}
             >
-              <Moon size={20} color={themeMode === 'dark' ? '#10b981' : '#6b7280'} />
+              <Moon size={20} color={themeMode === 'dark' ? theme.primary : theme.textSecondary} />
               <Text style={[styles.themeOptionText, themeMode === 'dark' && styles.themeOptionTextSelected]}>
                 Dark
               </Text>
@@ -247,7 +249,7 @@ export default function ProfileScreen() {
               style={[styles.themeOption, themeMode === 'system' && styles.themeOptionSelected]}
               onPress={() => setThemeMode('system')}
             >
-              <Monitor size={20} color={themeMode === 'system' ? '#10b981' : '#6b7280'} />
+              <Monitor size={20} color={themeMode === 'system' ? theme.primary : theme.textSecondary} />
               <Text style={[styles.themeOptionText, themeMode === 'system' && styles.themeOptionTextSelected]}>
                 System
               </Text>
@@ -257,7 +259,7 @@ export default function ProfileScreen() {
 
         <View style={[styles.settingsCard, { marginTop: 16 }]}>
           <View style={styles.settingRow}>
-            <Bell size={20} color="#6b7280" />
+            <Bell size={20} color={theme.textSecondary} />
             <Text style={styles.settingLabel}>Notifications</Text>
           </View>
 
@@ -319,16 +321,16 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.background,
   },
   header: {
     alignItems: 'center',
     padding: 24,
     paddingTop: 60,
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.surface,
   },
   avatar: {
     width: 80,
@@ -347,12 +349,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.text,
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginBottom: 12,
   },
   roleBadge: {
@@ -367,12 +369,12 @@ const styles = StyleSheet.create({
     color: '#10b981',
   },
   sobrietyCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     margin: 16,
     padding: 20,
     borderRadius: 16,
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -386,7 +388,7 @@ const styles = StyleSheet.create({
   sobrietyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
     marginLeft: 8,
   },
   daysSober: {
@@ -396,7 +398,7 @@ const styles = StyleSheet.create({
   },
   sobrietyDate: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginTop: 8,
   },
   section: {
@@ -405,16 +407,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
     marginBottom: 12,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -423,25 +425,26 @@ const styles = StyleSheet.create({
   actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
     marginLeft: 12,
   },
   inviteInputContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 3,
   },
   inviteInput: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: theme.borderLight,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     marginBottom: 12,
+    color: theme.text,
   },
   inviteSubmitButton: {
     backgroundColor: '#10b981',
@@ -462,17 +465,17 @@ const styles = StyleSheet.create({
   inviteCancelText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#6b7280',
+    color: theme.textSecondary,
   },
   signOutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#fee2e2',
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -490,19 +493,19 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: theme.textTertiary,
     fontWeight: '600',
   },
   footerSubtext: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: theme.textTertiary,
     marginTop: 4,
   },
   settingsCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     padding: 16,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -514,12 +517,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: theme.borderLight,
   },
   settingLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
     marginLeft: 12,
   },
   settingSubRow: {
@@ -530,7 +533,7 @@ const styles = StyleSheet.create({
   },
   settingSubLabel: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
   },
   themeOptions: {
     flexDirection: 'row',
@@ -544,8 +547,8 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: '#e5e7eb',
-    backgroundColor: '#f9fafb',
+    borderColor: theme.border,
+    backgroundColor: theme.background,
   },
   themeOptionSelected: {
     borderColor: '#10b981',
@@ -554,7 +557,7 @@ const styles = StyleSheet.create({
   themeOptionText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginTop: 6,
   },
   themeOptionTextSelected: {

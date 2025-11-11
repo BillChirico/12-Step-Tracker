@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
 import { SponsorSponseeRelationship, Task } from '@/types/database';
 import { Heart, Calendar, TrendingUp, CheckCircle, Users, Award } from 'lucide-react-native';
@@ -8,6 +9,7 @@ import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const { profile } = useAuth();
+  const { theme } = useTheme();
   const [relationships, setRelationships] = useState<SponsorSponseeRelationship[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,11 +73,12 @@ export default function HomeScreen() {
 
   const daysSober = getDaysSober();
   const milestone = getMilestone(daysSober);
+  const styles = createStyles(theme);
 
   return (
     <ScrollView
       style={styles.container}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#10b981" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={theme.primary} />}
     >
       <View style={styles.header}>
         <Text style={styles.greeting}>Hello, {profile?.first_name || 'Friend'}</Text>
@@ -195,10 +198,10 @@ export default function HomeScreen() {
 
 const { BookOpen, MessageCircle } = require('lucide-react-native');
 
-const styles = StyleSheet.create({
+const createStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: theme.background,
   },
   header: {
     padding: 24,
@@ -207,20 +210,20 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#111827',
+    color: theme.text,
     marginBottom: 4,
   },
   date: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
   },
   sobrietyCard: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     margin: 16,
     marginTop: 0,
     padding: 24,
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -238,11 +241,11 @@ const styles = StyleSheet.create({
   sobrietyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
   },
   sobrietyDate: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginTop: 4,
   },
   daysSoberContainer: {
@@ -255,7 +258,7 @@ const styles = StyleSheet.create({
   },
   daysSoberLabel: {
     fontSize: 16,
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginTop: 8,
   },
   milestoneBadge: {
@@ -273,12 +276,12 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   card: {
-    backgroundColor: '#ffffff',
+    backgroundColor: theme.card,
     margin: 16,
     marginTop: 0,
     padding: 20,
     borderRadius: 16,
-    shadowColor: '#000',
+    shadowColor: theme.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -292,7 +295,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
     marginLeft: 12,
   },
   relationshipItem: {
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
+    borderTopColor: theme.borderLight,
   },
   avatar: {
     width: 48,
@@ -322,16 +325,16 @@ const styles = StyleSheet.create({
   relationshipName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: theme.text,
   },
   relationshipMeta: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
     marginTop: 2,
   },
   emptyText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: theme.textSecondary,
     textAlign: 'center',
     paddingVertical: 16,
   },
