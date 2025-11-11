@@ -147,12 +147,14 @@ Runs the test suite using Jest and React Native Testing Library.
 
 **Testing Documentation:**
 
-- **[Testing Strategy](TESTING_STRATEGY.md)** - Comprehensive testing philosophy and approach
-- **[Implementation Guide](TESTING_IMPLEMENTATION_GUIDE.md)** - Step-by-step setup instructions
+- **[Testing Index](TESTING_INDEX.md)** - Start here! Complete guide to all testing documentation
 - **[Quick Reference](TESTING_QUICK_REFERENCE.md)** - Cheat sheet for writing tests
+- **[Implementation Guide](TESTING_IMPLEMENTATION_GUIDE.md)** - Step-by-step setup instructions
+- **[Testing Strategy](TESTING_STRATEGY.md)** - Comprehensive testing philosophy and approach
 - **[GitHub Issue](TESTING_GITHUB_ISSUE.md)** - Detailed implementation plan
+- **[Research Summary](TESTING_RESEARCH_SUMMARY.md)** - Research findings and tool evaluation
 
-The project uses Jest with React Native Testing Library for unit and integration testing. See the documentation above for best practices and examples.
+The project uses Jest with React Native Testing Library for unit and integration testing. See the [Testing Index](TESTING_INDEX.md) for a complete overview and navigation guide.
 
 ## Project Structure
 
