@@ -151,10 +151,17 @@ This project uses [Husky](https://typicode.github.io/husky/) for Git hooks with 
 
 **Pre-commit Hook**: Automatically runs on every commit to:
 
-- Format staged files with Prettier
-- Lint and auto-fix staged TypeScript/JavaScript files with ESLint
+- **Format code**: Prettier auto-formats **all** staged files (uses `--ignore-unknown` for unsupported types)
+- **Lint and fix**: ESLint auto-fixes staged JavaScript/TypeScript files
+- **Auto-stage**: Fixed files are automatically added back to staging
 
-The hooks run only on staged files, keeping commits fast and ensuring all committed code meets quality standards.
+**Configuration**:
+
+- Hook script: `.husky/pre-commit`
+- Lint-staged config: `package.json` → `lint-staged` section
+- Detailed documentation: `.github/GIT_HOOKS.md`
+
+The hooks run only on **staged files**, keeping commits fast (typically <1 second) and ensuring all committed code meets quality standards.
 
 **Setup**: Hooks are automatically installed when you run `pnpm install` (via the `prepare` script).
 
@@ -162,7 +169,11 @@ The hooks run only on staged files, keeping commits fast and ensuring all commit
 
 ```bash
 git commit --no-verify
+# or
+git commit -n
 ```
+
+**Note**: Pre-commit hooks do NOT run TypeScript type checking (too slow). Run `pnpm typecheck` manually before pushing, or let CI catch type errors.
 
 ## Project Structure
 
@@ -346,6 +357,7 @@ For the build jobs to work, configure these secrets in your GitHub repository se
 - `CLAUDE.md` - Detailed project architecture and code patterns
 - `GOOGLE_OAUTH_SETUP.md` - Google OAuth configuration guide
 - `.github/CICD.md` - Comprehensive CI/CD documentation including Claude Code Review
+- `.github/GIT_HOOKS.md` - Git hooks setup and troubleshooting guide
 - `supabase/migrations/` - Database schema and RLS policies
 - `.github/workflows/ci.yml` - Main CI/CD pipeline configuration
 - `.github/workflows/claude-code-review.yml` - AI code review workflow configuration
