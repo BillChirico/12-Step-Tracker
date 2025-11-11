@@ -3,9 +3,9 @@
  * This file runs before all tests and configures the testing environment
  */
 
-// Import custom matchers from jest-native
-// Temporarily commented out due to ESM issues with React Native 0.81.5
-// import '@testing-library/jest-native/extend-expect';
+// Note: @testing-library/jest-native is deprecated as of v5.4.3
+// Use built-in matchers from @testing-library/react-native v12.4+ instead
+// For now, we skip importing it to avoid React Native ESM compatibility issues
 
 // Mock console methods to reduce noise in test output
 global.console = {
