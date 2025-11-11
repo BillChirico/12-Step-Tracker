@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { Profile } from '@/types/database';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri } from 'expo-auth-session';
+import { Platform } from 'react-native';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -79,17 +80,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      (async () => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        const existingProfile = await fetchProfile(session.user.id);
+
+        if (!existingProfile) {
+          const nameParts = session.user.user_metadata?.full_name?.split(' ') || ['User', 'U'];
+          const firstName = nameParts[0] || 'User';
+          const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
+
+          await supabase.from('profiles').insert({
+            id: session.user.id,
+            email: session.user.email || '',
+            first_name: firstName,
+            last_initial: lastInitial.toUpperCase(),
+          });
+
           await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
         }
-        setLoading(false);
-      })();
+      } else {
+        setProfile(null);
+      }
+
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -104,54 +120,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = makeRedirectUri();
+    if (Platform.OS === 'web') {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+    } else {
+      const redirectUrl = makeRedirectUri({
+        scheme: 'myapp',
+        path: 'auth/callback',
+      });
 
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        skipBrowserRedirect: false,
-      },
-    });
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+        },
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    if (data?.url) {
-      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
+      if (data?.url) {
+        const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
 
-      if (result.type === 'success' && result.url) {
-        const url = new URL(result.url);
-        const access_token = url.searchParams.get('access_token');
-        const refresh_token = url.searchParams.get('refresh_token');
+        if (result.type === 'success' && result.url) {
+          const url = new URL(result.url);
+          const access_token = url.searchParams.get('access_token');
+          const refresh_token = url.searchParams.get('refresh_token');
 
-        if (access_token && refresh_token) {
-          const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          });
+          if (access_token && refresh_token) {
+            const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
+              access_token,
+              refresh_token,
+            });
 
-          if (sessionError) throw sessionError;
+            if (sessionError) throw sessionError;
 
-          if (sessionData.user) {
-            const { data: existingProfile } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', sessionData.user.id)
-              .maybeSingle();
+            if (sessionData.user) {
+              const { data: existingProfile } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', sessionData.user.id)
+                .maybeSingle();
 
-            if (!existingProfile) {
-              const nameParts = sessionData.user.user_metadata?.full_name?.split(' ') || ['User', 'U'];
-              const firstName = nameParts[0] || 'User';
-              const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
+              if (!existingProfile) {
+                const nameParts = sessionData.user.user_metadata?.full_name?.split(' ') || ['User', 'U'];
+                const firstName = nameParts[0] || 'User';
+                const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
 
-              const { error: profileError } = await supabase.from('profiles').insert({
-                id: sessionData.user.id,
-                email: sessionData.user.email || '',
-                first_name: firstName,
-                last_initial: lastInitial.toUpperCase(),
-              });
+                const { error: profileError } = await supabase.from('profiles').insert({
+                  id: sessionData.user.id,
+                  email: sessionData.user.email || '',
+                  first_name: firstName,
+                  last_initial: lastInitial.toUpperCase(),
+                });
 
-              if (profileError) throw profileError;
+                if (profileError) throw profileError;
+              }
             }
           }
         }

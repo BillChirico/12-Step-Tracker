@@ -17,8 +17,15 @@ To enable Google Sign-In in your app, you need to configure Google OAuth in your
 
 Add the following redirect URIs to your Google OAuth client:
 
+**For Supabase (Required):**
 - `https://vzwdsjphpabtxhmffous.supabase.co/auth/v1/callback`
-- `myapp://` (for mobile app)
+
+**For Local Development (Optional):**
+- `http://localhost:8081`
+- `http://localhost:19006`
+
+**For Mobile App (Optional):**
+- `myapp://auth/callback`
 
 ### 3. Configure Supabase
 
@@ -28,12 +35,21 @@ Add the following redirect URIs to your Google OAuth client:
 4. Enter your Google OAuth **Client ID** and **Client Secret**
 5. Save the configuration
 
-### 4. Test the Integration
+### 4. Configure Site URL in Supabase
+
+**Important:** You must also configure the Site URL in Supabase:
+
+1. Go to your [Supabase Dashboard](https://app.supabase.com/project/vzwdsjphpabtxhmffous)
+2. Navigate to **Authentication** → **URL Configuration**
+3. Set the **Site URL** to your app's URL (e.g., `http://localhost:8081` for development or your production URL)
+4. Add redirect URLs under **Redirect URLs** section to allow OAuth callbacks
+
+### 5. Test the Integration
 
 After configuration:
 
-1. The "Continue with Google" button will appear on both login and signup screens
-2. Clicking it will open a browser window for Google authentication
+1. The "Continue with Google" button will appear on both login and signup screens with the Google logo
+2. Clicking it will redirect to Google authentication
 3. After successful authentication, users will be redirected back to the app
 4. New Google users will be automatically created in the profiles table
 5. Users without onboarding data will be redirected to complete onboarding
