@@ -609,30 +609,43 @@ export default function ProfileScreen() {
             </View>
           ) : sponseeRelationships.length > 0 ? (
             <>
-              {sponseeRelationships.map((rel) => (
-                <View key={rel.id} style={styles.relationshipCard}>
-                  <View style={styles.relationshipHeader}>
-                    <View style={styles.avatar}>
-                      <Text style={styles.avatarText}>
-                        {(rel.sponsee?.first_name || '?')[0].toUpperCase()}
-                      </Text>
+{sponseeRelationships.map((rel) => {
+                const daysSober = rel.sponsee?.sobriety_date
+                  ? Math.floor((new Date().getTime() - new Date(rel.sponsee.sobriety_date).getTime()) / (1000 * 60 * 60 * 24))
+                  : 0;
+                return (
+                  <View key={rel.id} style={styles.relationshipCard}>
+                    <View style={styles.relationshipHeader}>
+                      <View style={styles.avatar}>
+                        <Text style={styles.avatarText}>
+                          {(rel.sponsee?.first_name || '?')[0].toUpperCase()}
+                        </Text>
+                      </View>
+                      <View style={styles.relationshipInfo}>
+                        <Text style={styles.relationshipName}>{rel.sponsee?.first_name} {rel.sponsee?.last_initial}.</Text>
+                        <Text style={styles.relationshipMeta}>
+                          Connected {new Date(rel.connected_at).toLocaleDateString()}
+                        </Text>
+                        {rel.sponsee?.sobriety_date && (
+                          <View style={styles.sobrietyInfo}>
+                            <Heart size={14} color={theme.primary} fill={theme.primary} />
+                            <Text style={styles.sobrietyText}>
+                              {daysSober} days sober
+                            </Text>
+                          </View>
+                        )}
+                      </View>
                     </View>
-                    <View style={styles.relationshipInfo}>
-                      <Text style={styles.relationshipName}>{rel.sponsee?.first_name} {rel.sponsee?.last_initial}.</Text>
-                      <Text style={styles.relationshipMeta}>
-                        Connected {new Date(rel.connected_at).toLocaleDateString()}
-                      </Text>
-                    </View>
+                    <TouchableOpacity
+                      style={styles.disconnectButton}
+                      onPress={() => disconnectRelationship(rel.id, true, `${rel.sponsee?.first_name} ${rel.sponsee?.last_initial}.`)}
+                    >
+                      <UserMinus size={18} color="#ef4444" />
+                      <Text style={styles.disconnectText}>Disconnect</Text>
+                    </TouchableOpacity>
                   </View>
-                  <TouchableOpacity
-                    style={styles.disconnectButton}
-                    onPress={() => disconnectRelationship(rel.id, true, `${rel.sponsee?.first_name} ${rel.sponsee?.last_initial}.`)}
-                  >
-                    <UserMinus size={18} color="#ef4444" />
-                    <Text style={styles.disconnectText}>Disconnect</Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
+                );
+              })}
               <TouchableOpacity style={styles.actionButton} onPress={generateInviteCode}>
                 <Share2 size={20} color={theme.primary} />
                 <Text style={styles.actionButtonText}>Generate New Invite Code</Text>
@@ -658,30 +671,43 @@ export default function ProfileScreen() {
               <ActivityIndicator size="small" color={theme.primary} />
             </View>
           ) : sponsorRelationships.length > 0 ? (
-            sponsorRelationships.map((rel) => (
-              <View key={rel.id} style={styles.relationshipCard}>
-                <View style={styles.relationshipHeader}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {(rel.sponsor?.first_name || '?')[0].toUpperCase()}
-                    </Text>
+            sponsorRelationships.map((rel) => {
+              const daysSober = rel.sponsor?.sobriety_date
+                ? Math.floor((new Date().getTime() - new Date(rel.sponsor.sobriety_date).getTime()) / (1000 * 60 * 60 * 24))
+                : 0;
+              return (
+                <View key={rel.id} style={styles.relationshipCard}>
+                  <View style={styles.relationshipHeader}>
+                    <View style={styles.avatar}>
+                      <Text style={styles.avatarText}>
+                        {(rel.sponsor?.first_name || '?')[0].toUpperCase()}
+                      </Text>
+                    </View>
+                    <View style={styles.relationshipInfo}>
+                      <Text style={styles.relationshipName}>{rel.sponsor?.first_name} {rel.sponsor?.last_initial}.</Text>
+                      <Text style={styles.relationshipMeta}>
+                        Connected {new Date(rel.connected_at).toLocaleDateString()}
+                      </Text>
+                      {rel.sponsor?.sobriety_date && (
+                        <View style={styles.sobrietyInfo}>
+                          <Heart size={14} color={theme.primary} fill={theme.primary} />
+                          <Text style={styles.sobrietyText}>
+                            {daysSober} days sober
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                   </View>
-                  <View style={styles.relationshipInfo}>
-                    <Text style={styles.relationshipName}>{rel.sponsor?.first_name} {rel.sponsor?.last_initial}.</Text>
-                    <Text style={styles.relationshipMeta}>
-                      Connected {new Date(rel.connected_at).toLocaleDateString()}
-                    </Text>
-                  </View>
+                  <TouchableOpacity
+                    style={styles.disconnectButton}
+                    onPress={() => disconnectRelationship(rel.id, false, `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`)}
+                  >
+                    <UserMinus size={18} color="#ef4444" />
+                    <Text style={styles.disconnectText}>Disconnect</Text>
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity
-                  style={styles.disconnectButton}
-                  onPress={() => disconnectRelationship(rel.id, false, `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`)}
-                >
-                  <UserMinus size={18} color="#ef4444" />
-                  <Text style={styles.disconnectText}>Disconnect</Text>
-                </TouchableOpacity>
-              </View>
-            ))
+              );
+            })
           ) : (
             <View>
               <Text style={styles.emptyStateText}>No sponsor connected yet</Text>
@@ -1393,6 +1419,18 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 2,
+  },
+  sobrietyInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  sobrietyText: {
+    fontSize: 12,
+    fontFamily: theme.fontRegular,
+    color: theme.primary,
+    fontWeight: '600',
   },
   disconnectButton: {
     flexDirection: 'row',
