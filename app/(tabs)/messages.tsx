@@ -183,11 +183,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 4,
   },
@@ -212,6 +214,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ffffff',
   },
@@ -221,11 +224,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   chatName: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
   },
   chatRole: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 2,
   },
@@ -236,12 +241,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     textAlign: 'center',
     marginTop: 8,
@@ -259,11 +266,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   backText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.primary,
     fontWeight: '600',
   },
   chatHeaderTitle: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
   },
@@ -289,10 +298,12 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   messageText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: '#ffffff',
   },
   messageTime: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     color: '#ffffff',
     opacity: 0.7,
     marginTop: 4,
@@ -319,6 +330,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     maxHeight: 100,
     color: theme.text,
   },

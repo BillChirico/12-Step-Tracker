@@ -267,12 +267,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
   },
   form: {
@@ -285,6 +287,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   label: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 8,
@@ -296,6 +299,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.text,
   },
   button: {
@@ -311,6 +315,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
   },
   divider: {
@@ -327,6 +332,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginHorizontal: 16,
     color: '#9ca3af',
     fontSize: 14,
+    fontFamily: theme.fontRegular,
   },
   googleButton: {
     backgroundColor: theme.card,
@@ -342,6 +348,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   googleButtonText: {
     color: '#374151',
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
   },
   loginLink: {
@@ -351,6 +358,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   loginLinkText: {
     color: theme.textSecondary,
     fontSize: 14,
+    fontFamily: theme.fontRegular,
   },
   loginLinkBold: {
     color: '#007AFF',

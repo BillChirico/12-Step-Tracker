@@ -142,11 +142,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 4,
   },
@@ -159,6 +161,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 12,
@@ -191,21 +194,25 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   stepBadgeText: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ffffff',
   },
   taskDate: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
   },
   taskTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 8,
   },
   taskDescription: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 20,
     marginBottom: 12,
@@ -218,6 +225,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sponsorText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
   },
   completeButton: {
@@ -230,12 +238,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   completeButtonText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.primary,
     marginLeft: 6,
   },
   completedDate: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     color: theme.primary,
     fontWeight: '600',
   },
@@ -246,12 +256,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginTop: 16,
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     textAlign: 'center',
     marginTop: 8,

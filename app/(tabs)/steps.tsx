@@ -107,11 +107,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   headerTitle: {
     fontSize: 28,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
   },
   headerSubtitle: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 4,
   },
@@ -142,6 +144,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   stepNumberText: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: '#ffffff',
   },
@@ -150,12 +153,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   stepTitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 4,
   },
   stepDescription: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 20,
   },
@@ -176,6 +181,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   modalStepNumber: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.primary,
   },
@@ -185,6 +191,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
     marginBottom: 12,
@@ -192,6 +199,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   modalDescription: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 24,
     marginBottom: 24,
@@ -201,12 +209,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 12,
   },
   sectionContent: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 26,
   },
@@ -216,6 +226,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   promptBullet: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.primary,
     marginRight: 12,
     fontWeight: '700',
@@ -223,6 +234,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   promptText: {
     flex: 1,
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 24,
   },

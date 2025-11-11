@@ -209,12 +209,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   greeting: {
     fontSize: 28,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
     marginBottom: 4,
   },
   date: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
   },
   sobrietyCard: {
@@ -240,11 +242,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sobrietyTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
   },
   sobrietyDate: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 4,
   },
@@ -253,11 +257,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   daysSoberCount: {
     fontSize: 64,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.primary,
   },
   daysSoberLabel: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 8,
   },
@@ -272,6 +278,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   milestoneText: {
     color: '#ffffff',
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     marginLeft: 6,
   },
@@ -294,6 +301,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   cardTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginLeft: 12,
@@ -315,6 +323,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 20,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ffffff',
   },
@@ -324,16 +333,19 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   relationshipName: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
   },
   relationshipMeta: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 2,
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     textAlign: 'center',
     paddingVertical: 16,
@@ -350,11 +362,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   taskTitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#111827',
   },
   taskMeta: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: '#6b7280',
     marginTop: 2,
   },
@@ -366,6 +380,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   taskBadgeText: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ffffff',
   },
@@ -376,6 +391,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   viewAllText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.primary,
   },
@@ -399,12 +415,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   actionTitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#111827',
     marginTop: 12,
   },
   actionSubtitle: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     color: '#6b7280',
     marginTop: 4,
   },

@@ -170,6 +170,7 @@ export default function OnboardingScreen() {
                 style={{
                   padding: '12px',
                   fontSize: '16px',
+    fontFamily: theme.fontRegular,
                   borderRadius: '8px',
                   border: '2px solid #007AFF',
                   marginBottom: '16px',
@@ -222,6 +223,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
     marginBottom: 8,
@@ -229,12 +231,14 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     textAlign: 'center',
     marginBottom: 40,
   },
   sectionTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 16,
@@ -263,6 +267,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   roleTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#374151',
     marginBottom: 4,
@@ -272,6 +277,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   roleDescription: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 20,
   },
@@ -294,6 +300,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   dateText: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginLeft: 12,
@@ -303,11 +310,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   daysCount: {
     fontSize: 64,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: '#007AFF',
   },
   daysLabel: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 8,
   },
@@ -323,6 +332,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
   },
   buttonGroup: {
@@ -340,6 +350,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   secondaryButtonText: {
     color: '#374151',
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
   },
   flexButton: {

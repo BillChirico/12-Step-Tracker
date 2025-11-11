@@ -356,17 +356,20 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 32,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: '#ffffff',
   },
   name: {
     fontSize: 24,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.text,
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginBottom: 12,
   },
@@ -378,6 +381,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   roleText: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.primary,
   },
@@ -400,17 +404,20 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sobrietyTitle: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginLeft: 8,
   },
   daysSober: {
     fontSize: 48,
+    fontFamily: theme.fontRegular,
     fontWeight: '700',
     color: theme.primary,
   },
   sobrietyDate: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     marginTop: 8,
   },
@@ -419,6 +426,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginBottom: 12,
@@ -437,6 +445,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginLeft: 12,
@@ -456,6 +465,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     marginBottom: 12,
     color: theme.text,
   },
@@ -468,6 +478,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   inviteSubmitText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ffffff',
   },
@@ -477,6 +488,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   inviteCancelText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.textSecondary,
   },
@@ -496,6 +508,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   signOutText: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: '#ef4444',
     marginLeft: 12,
@@ -506,11 +519,13 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   footerText: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textTertiary,
     fontWeight: '600',
   },
   footerSubtext: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     color: theme.textTertiary,
     marginTop: 4,
   },
@@ -534,6 +549,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   settingLabel: {
     fontSize: 16,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.text,
     marginLeft: 12,
@@ -546,6 +562,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   settingSubLabel: {
     fontSize: 14,
+    fontFamily: theme.fontRegular,
     color: theme.textSecondary,
   },
   themeOptions: {
@@ -569,6 +586,7 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   themeOptionText: {
     fontSize: 12,
+    fontFamily: theme.fontRegular,
     fontWeight: '600',
     color: theme.textSecondary,
     marginTop: 6,

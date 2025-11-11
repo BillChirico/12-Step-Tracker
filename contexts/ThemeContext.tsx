@@ -19,6 +19,10 @@ interface ThemeColors {
   success: string;
   white: string;
   black: string;
+  fontRegular: string;
+  fontMedium: string;
+  fontSemiBold: string;
+  fontBold: string;
 }
 
 interface ThemeContextType {
@@ -43,6 +47,10 @@ const lightTheme: ThemeColors = {
   success: '#007AFF',
   white: '#ffffff',
   black: '#000000',
+  fontRegular: 'JetBrainsMono-Regular',
+  fontMedium: 'JetBrainsMono-Medium',
+  fontSemiBold: 'JetBrainsMono-SemiBold',
+  fontBold: 'JetBrainsMono-Bold',
 };
 
 const darkTheme: ThemeColors = {
@@ -60,6 +68,10 @@ const darkTheme: ThemeColors = {
   success: '#007AFF',
   white: '#ffffff',
   black: '#000000',
+  fontRegular: 'JetBrainsMono-Regular',
+  fontMedium: 'JetBrainsMono-Medium',
+  fontSemiBold: 'JetBrainsMono-SemiBold',
+  fontBold: 'JetBrainsMono-Bold',
 };
 
 const ThemeContext = createContext<ThemeContextType>({
