@@ -116,7 +116,9 @@ export default function ProfileScreen() {
         <Text style={styles.name}>{profile?.full_name}</Text>
         <Text style={styles.email}>{profile?.email}</Text>
         <View style={styles.roleBadge}>
-          <Text style={styles.roleText}>{profile?.role?.toUpperCase()}</Text>
+          <Text style={styles.roleText}>
+            {profile?.role === 'both' ? 'SPONSOR & SPONSEE' : profile?.role?.toUpperCase()}
+          </Text>
         </View>
       </View>
 
