@@ -302,7 +302,7 @@ All documentation in this directory:
 
 - **Last Updated**: January 2025
 - **Version**: 1.0
-- **Compatible with**: Expo SDK 54, React Native 0.81.4
+- **Compatible with**: Expo SDK 54, React Native 0.81.5
 
 ---
 
