@@ -61,6 +61,13 @@ pnpm format:check
 - All commits must be made through GitButler interface
 - You can run informational commands like `git status`, `git diff`, `git log`
 
+**Pre-commit Hooks**:
+
+- Husky pre-commit hooks automatically run on commits
+- They will format and lint staged files
+- Ensure code passes these checks before committing
+- Use `--no-verify` flag to skip hooks if absolutely necessary (not recommended)
+
 ## 8. Environment Variables
 
 - Ensure no sensitive data is hardcoded

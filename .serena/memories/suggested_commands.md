@@ -26,6 +26,21 @@ pnpm lint
 
 Runs ESLint to check code quality and style.
 
+## Git Hooks
+
+Pre-commit hooks are automatically installed via Husky and will run when you commit changes.
+
+The pre-commit hook will:
+
+- Format staged files with Prettier
+- Lint and auto-fix staged TypeScript/JavaScript files with ESLint
+
+To skip hooks (not recommended):
+
+```bash
+git commit --no-verify
+```
+
 ## Code Formatting
 
 ```bash

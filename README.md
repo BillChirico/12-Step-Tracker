@@ -145,6 +145,25 @@ pnpm format:check
 
 Checks if code is properly formatted without making changes.
 
+### Git Hooks
+
+This project uses [Husky](https://typicode.github.io/husky/) for Git hooks with [lint-staged](https://github.com/lint-staged/lint-staged) to ensure code quality before commits.
+
+**Pre-commit Hook**: Automatically runs on every commit to:
+
+- Format staged files with Prettier
+- Lint and auto-fix staged TypeScript/JavaScript files with ESLint
+
+The hooks run only on staged files, keeping commits fast and ensuring all committed code meets quality standards.
+
+**Setup**: Hooks are automatically installed when you run `pnpm install` (via the `prepare` script).
+
+**Skip hooks** (not recommended):
+
+```bash
+git commit --no-verify
+```
+
 ## Project Structure
 
 ```
