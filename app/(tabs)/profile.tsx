@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Alert, Share, Switch, Platform, ActivityIndicator, Linking } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Alert, Share, Switch, Platform, ActivityIndicator, Linking, Modal } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
-import { LogOut, Heart, Share2, QrCode, Bell, Moon, Sun, Monitor, UserMinus } from 'lucide-react-native';
+import { LogOut, Heart, Share2, QrCode, Bell, Moon, Sun, Monitor, UserMinus, Edit2, Calendar, AlertCircle } from 'lucide-react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import packageJson from '../../package.json';
 
 export default function ProfileScreen() {
@@ -21,6 +22,15 @@ export default function ProfileScreen() {
     milestones: profile?.notification_preferences?.milestones ?? true,
     daily: profile?.notification_preferences?.daily ?? true,
   });
+  const [showSobrietyDatePicker, setShowSobrietyDatePicker] = useState(false);
+  const [selectedSobrietyDate, setSelectedSobrietyDate] = useState<Date>(new Date());
+  const [showRelapseModal, setShowRelapseModal] = useState(false);
+  const [relapseDate, setRelapseDate] = useState<Date>(new Date());
+  const [recoveryDate, setRecoveryDate] = useState<Date>(new Date());
+  const [relapseNotes, setRelapseNotes] = useState('');
+  const [showRelapseDatePicker, setShowRelapseDatePicker] = useState(false);
+  const [showRecoveryDatePicker, setShowRecoveryDatePicker] = useState(false);
+  const [isLoggingRelapse, setIsLoggingRelapse] = useState(false);
 
   const fetchRelationships = async () => {
     if (!profile) return;
@@ -353,6 +363,178 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleEditSobrietyDate = () => {
+    if (profile?.sobriety_date) {
+      setSelectedSobrietyDate(new Date(profile.sobriety_date));
+    }
+    setShowSobrietyDatePicker(true);
+  };
+
+  const updateSobrietyDate = async (newDate: Date) => {
+    if (!profile) return;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDate = new Date(newDate);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate > today) {
+      if (Platform.OS === 'web') {
+        window.alert('Sobriety date cannot be in the future');
+      } else {
+        Alert.alert('Invalid Date', 'Sobriety date cannot be in the future');
+      }
+      return;
+    }
+
+    const confirmMessage = `Update your sobriety date to ${newDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}?`;
+
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm(confirmMessage)
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Confirm Date Change',
+            confirmMessage,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Update', onPress: () => resolve(true) },
+            ]
+          );
+        });
+
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ sobriety_date: newDate.toISOString().split('T')[0] })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      await refreshProfile();
+
+      if (Platform.OS === 'web') {
+        window.alert('Sobriety date updated successfully');
+      } else {
+        Alert.alert('Success', 'Sobriety date updated successfully');
+      }
+    } catch (error: any) {
+      console.error('Error updating sobriety date:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Failed to update sobriety date');
+      } else {
+        Alert.alert('Error', 'Failed to update sobriety date');
+      }
+    }
+  };
+
+  const handleLogRelapse = () => {
+    const today = new Date();
+    setRelapseDate(today);
+    setRecoveryDate(today);
+    setRelapseNotes('');
+    setShowRelapseModal(true);
+  };
+
+  const submitRelapse = async () => {
+    if (!profile) return;
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    if (relapseDate > today) {
+      if (Platform.OS === 'web') {
+        window.alert('Relapse date cannot be in the future');
+      } else {
+        Alert.alert('Invalid Date', 'Relapse date cannot be in the future');
+      }
+      return;
+    }
+
+    if (recoveryDate < relapseDate) {
+      if (Platform.OS === 'web') {
+        window.alert('Recovery restart date must be on or after the relapse date');
+      } else {
+        Alert.alert('Invalid Date', 'Recovery restart date must be on or after the relapse date');
+      }
+      return;
+    }
+
+    const confirmMessage = 'This will log your relapse and update your sobriety date. Your sponsor will be notified. Continue?';
+
+    const confirmed = Platform.OS === 'web'
+      ? window.confirm(confirmMessage)
+      : await new Promise<boolean>((resolve) => {
+          Alert.alert(
+            'Confirm Relapse Log',
+            confirmMessage,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Continue', style: 'destructive', onPress: () => resolve(true) },
+            ]
+          );
+        });
+
+    if (!confirmed) return;
+
+    setIsLoggingRelapse(true);
+
+    try {
+      const { error: relapseError } = await supabase.from('relapses').insert({
+        user_id: profile.id,
+        relapse_date: relapseDate.toISOString().split('T')[0],
+        recovery_restart_date: recoveryDate.toISOString().split('T')[0],
+        notes: relapseNotes.trim() || null,
+      });
+
+      if (relapseError) throw relapseError;
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ sobriety_date: recoveryDate.toISOString().split('T')[0] })
+        .eq('id', profile.id);
+
+      if (updateError) throw updateError;
+
+      const { data: sponsors } = await supabase
+        .from('sponsor_sponsee_relationships')
+        .select('sponsor_id')
+        .eq('sponsee_id', profile.id)
+        .eq('status', 'active');
+
+      if (sponsors && sponsors.length > 0) {
+        const notifications = sponsors.map(rel => ({
+          user_id: rel.sponsor_id,
+          type: 'milestone',
+          title: 'Sponsee Relapse',
+          content: `${profile.first_name} ${profile.last_initial}. has logged a relapse and restarted their recovery journey.`,
+          data: { sponsee_id: profile.id, relapse_date: relapseDate.toISOString() },
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      }
+
+      await refreshProfile();
+      setShowRelapseModal(false);
+
+      if (Platform.OS === 'web') {
+        window.alert('Your relapse has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
+      } else {
+        Alert.alert('Relapse Logged', 'Your relapse has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
+      }
+    } catch (error: any) {
+      console.error('Error logging relapse:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Failed to log relapse. Please try again.');
+      } else {
+        Alert.alert('Error', 'Failed to log relapse. Please try again.');
+      }
+    } finally {
+      setIsLoggingRelapse(false);
+    }
+  };
+
   const handleSignOut = async () => {
     if (Platform.OS === 'web') {
       const confirmed = window.confirm('Are you sure you want to sign out?');
@@ -404,9 +586,18 @@ export default function ProfileScreen() {
           <Text style={styles.sobrietyTitle}>Sobriety Journey</Text>
         </View>
         <Text style={styles.daysSober}>{getDaysSober()} Days</Text>
-        <Text style={styles.sobrietyDate}>
-          Since {new Date(profile?.sobriety_date || '').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-        </Text>
+        <View style={styles.sobrietyDateContainer}>
+          <Text style={styles.sobrietyDate}>
+            Since {new Date(profile?.sobriety_date || '').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </Text>
+          <TouchableOpacity style={styles.editButton} onPress={handleEditSobrietyDate}>
+            <Edit2 size={16} color={theme.primary} />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity style={styles.relapseButton} onPress={handleLogRelapse}>
+          <AlertCircle size={18} color="#ffffff" />
+          <Text style={styles.relapseButtonText}>Log a Relapse</Text>
+        </TouchableOpacity>
       </View>
 
       {(profile?.role === 'sponsor' || profile?.role === 'both') && (
@@ -653,6 +844,220 @@ export default function ProfileScreen() {
           <Text style={styles.footerCredit}>By Bill Chirico</Text>
         </TouchableOpacity>
       </View>
+
+      {Platform.OS === 'web' && showSobrietyDatePicker && (
+        <Modal visible={showSobrietyDatePicker} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.datePickerModal}>
+              <Text style={styles.modalTitle}>Edit Sobriety Date</Text>
+              <input
+                type="date"
+                value={selectedSobrietyDate.toISOString().split('T')[0]}
+                max={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setSelectedSobrietyDate(new Date(e.target.value))}
+                style={{
+                  padding: 12,
+                  fontSize: 16,
+                  borderRadius: 8,
+                  border: '1px solid #d1d5db',
+                  marginTop: 16,
+                  marginBottom: 16,
+                  width: '100%',
+                }}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.modalCancelButton}
+                  onPress={() => setShowSobrietyDatePicker(false)}
+                >
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalConfirmButton}
+                  onPress={() => {
+                    updateSobrietyDate(selectedSobrietyDate);
+                    setShowSobrietyDatePicker(false);
+                  }}
+                >
+                  <Text style={styles.modalConfirmText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {Platform.OS !== 'web' && showSobrietyDatePicker && (
+        <Modal visible={showSobrietyDatePicker} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.datePickerModal}>
+              <Text style={styles.modalTitle}>Edit Sobriety Date</Text>
+              <DateTimePicker
+                value={selectedSobrietyDate}
+                mode="date"
+                display="spinner"
+                onChange={(event, date) => {
+                  if (date) setSelectedSobrietyDate(date);
+                }}
+                maximumDate={new Date()}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.modalCancelButton}
+                  onPress={() => setShowSobrietyDatePicker(false)}
+                >
+                  <Text style={styles.modalCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalConfirmButton}
+                  onPress={() => {
+                    updateSobrietyDate(selectedSobrietyDate);
+                    setShowSobrietyDatePicker(false);
+                  }}
+                >
+                  <Text style={styles.modalConfirmText}>Update</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      <Modal visible={showRelapseModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.relapseModal}>
+            <Text style={styles.modalTitle}>Log a Relapse</Text>
+            <Text style={styles.modalSubtitle}>
+              Recovery is a journey, not a destination. Logging a relapse is an act of courage and honesty.
+            </Text>
+
+            <View style={styles.dateSection}>
+              <Text style={styles.dateLabel}>Relapse Date</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={relapseDate.toISOString().split('T')[0]}
+                  max={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => setRelapseDate(new Date(e.target.value))}
+                  style={{
+                    padding: 12,
+                    fontSize: 16,
+                    borderRadius: 8,
+                    border: '1px solid #d1d5db',
+                    width: '100%',
+                  }}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowRelapseDatePicker(true)}
+                  >
+                    <Calendar size={20} color={theme.textSecondary} />
+                    <Text style={styles.dateButtonText}>
+                      {relapseDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showRelapseDatePicker && (
+                    <DateTimePicker
+                      value={relapseDate}
+                      mode="date"
+                      display="default"
+                      onChange={(event, date) => {
+                        setShowRelapseDatePicker(false);
+                        if (date) setRelapseDate(date);
+                      }}
+                      maximumDate={new Date()}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.dateSection}>
+              <Text style={styles.dateLabel}>Recovery Restart Date</Text>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={recoveryDate.toISOString().split('T')[0]}
+                  min={relapseDate.toISOString().split('T')[0]}
+                  onChange={(e) => setRecoveryDate(new Date(e.target.value))}
+                  style={{
+                    padding: 12,
+                    fontSize: 16,
+                    borderRadius: 8,
+                    border: '1px solid #d1d5db',
+                    width: '100%',
+                  }}
+                />
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={styles.dateButton}
+                    onPress={() => setShowRecoveryDatePicker(true)}
+                  >
+                    <Calendar size={20} color={theme.textSecondary} />
+                    <Text style={styles.dateButtonText}>
+                      {recoveryDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    </Text>
+                  </TouchableOpacity>
+                  {showRecoveryDatePicker && (
+                    <DateTimePicker
+                      value={recoveryDate}
+                      mode="date"
+                      display="default"
+                      onChange={(event, date) => {
+                        setShowRecoveryDatePicker(false);
+                        if (date) setRecoveryDate(date);
+                      }}
+                      minimumDate={relapseDate}
+                    />
+                  )}
+                </>
+              )}
+            </View>
+
+            <View style={styles.notesSection}>
+              <Text style={styles.dateLabel}>Notes (Optional)</Text>
+              <TextInput
+                style={styles.notesInput}
+                placeholder="What happened? How are you feeling?"
+                placeholderTextColor={theme.textTertiary}
+                value={relapseNotes}
+                onChangeText={setRelapseNotes}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+
+            <Text style={styles.privacyNote}>
+              This information will be visible to you and your sponsor.
+            </Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => setShowRelapseModal(false)}
+                disabled={isLoggingRelapse}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalConfirmButton, styles.relapseConfirmButton, isLoggingRelapse && styles.buttonDisabled]}
+                onPress={submitRelapse}
+                disabled={isLoggingRelapse}
+              >
+                {isLoggingRelapse ? (
+                  <ActivityIndicator size="small" color="#ffffff" />
+                ) : (
+                  <Text style={styles.modalConfirmText}>Log Relapse</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -738,11 +1143,39 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontWeight: '700',
     color: theme.primary,
   },
+  sobrietyDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    gap: 8,
+  },
   sobrietyDate: {
     fontSize: 14,
     fontFamily: theme.fontRegular,
     color: theme.textSecondary,
-    marginTop: 8,
+  },
+  editButton: {
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: theme.primaryLight,
+  },
+  relapseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ef4444',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    gap: 8,
+  },
+  relapseButtonText: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: '#ffffff',
   },
   section: {
     padding: 16,
@@ -989,5 +1422,120 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   buttonDisabled: {
     opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  datePickerModal: {
+    backgroundColor: theme.card,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+  },
+  relapseModal: {
+    backgroundColor: theme.card,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 500,
+    maxHeight: '90%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontFamily: theme.fontRegular,
+    fontWeight: '700',
+    color: theme.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    color: theme.textSecondary,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 20,
+  },
+  dateSection: {
+    marginBottom: 20,
+  },
+  dateLabel: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: theme.text,
+    marginBottom: 8,
+  },
+  dateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.borderLight,
+    padding: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  dateButtonText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: theme.text,
+  },
+  notesSection: {
+    marginBottom: 20,
+  },
+  notesInput: {
+    backgroundColor: theme.borderLight,
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: theme.text,
+    minHeight: 100,
+  },
+  privacyNote: {
+    fontSize: 12,
+    fontFamily: theme.fontRegular,
+    color: theme.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalCancelButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.border,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: theme.textSecondary,
+  },
+  modalConfirmButton: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: theme.primary,
+    alignItems: 'center',
+  },
+  relapseConfirmButton: {
+    backgroundColor: '#ef4444',
+  },
+  modalConfirmText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: '#ffffff',
   },
 });

@@ -9,17 +9,35 @@ export default function StepsScreen() {
   const { theme } = useTheme();
   const [steps, setSteps] = useState<StepContent[]>([]);
   const [selectedStep, setSelectedStep] = useState<StepContent | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSteps();
   }, []);
 
   const fetchSteps = async () => {
-    const { data } = await supabase
-      .from('steps_content')
-      .select('*')
-      .order('step_number');
-    setSteps(data || []);
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: fetchError } = await supabase
+        .from('steps_content')
+        .select('*')
+        .order('step_number');
+
+      if (fetchError) {
+        console.error('Error fetching steps:', fetchError);
+        setError('Failed to load steps content');
+      } else {
+        console.log('Steps loaded:', data?.length);
+        setSteps(data || []);
+      }
+    } catch (err) {
+      console.error('Exception fetching steps:', err);
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const styles = createStyles(theme);
@@ -32,7 +50,25 @@ export default function StepsScreen() {
       </View>
 
       <ScrollView style={styles.content}>
-        {steps.map((step) => (
+        {loading && (
+          <View style={styles.centerContainer}>
+            <Text style={styles.loadingText}>Loading steps...</Text>
+          </View>
+        )}
+        {error && (
+          <View style={styles.centerContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retryButton} onPress={fetchSteps}>
+              <Text style={styles.retryText}>Retry</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+        {!loading && !error && steps.length === 0 && (
+          <View style={styles.centerContainer}>
+            <Text style={styles.emptyText}>No steps content available</Text>
+          </View>
+        )}
+        {!loading && !error && steps.map((step) => (
           <TouchableOpacity
             key={step.id}
             style={styles.stepCard}
@@ -237,5 +273,42 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fontRegular,
     color: theme.textSecondary,
     lineHeight: 24,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+    minHeight: 200,
+  },
+  loadingText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: theme.textSecondary,
+  },
+  errorText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: '#ef4444',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  emptyText: {
+    fontSize: 16,
+    fontFamily: theme.fontRegular,
+    color: theme.textSecondary,
+    textAlign: 'center',
+  },
+  retryButton: {
+    backgroundColor: theme.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryText: {
+    fontSize: 14,
+    fontFamily: theme.fontRegular,
+    fontWeight: '600',
+    color: '#ffffff',
   },
 });
