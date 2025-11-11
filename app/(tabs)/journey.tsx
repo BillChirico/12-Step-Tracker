@@ -3,11 +3,27 @@ import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-nat
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
-import { UserStepProgress, SlipUp } from '@/types/database';
-import { Calendar, CheckCircle, Heart, RefreshCw, Award, TrendingUp } from 'lucide-react-native';
+import { UserStepProgress, SlipUp, Task } from '@/types/database';
+import {
+  Calendar,
+  CheckCircle,
+  Heart,
+  RefreshCw,
+  Award,
+  TrendingUp,
+  CheckSquare,
+  ListChecks,
+  Target,
+} from 'lucide-react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
-type TimelineEventType = 'sobriety_start' | 'slip_up' | 'step_completion' | 'milestone';
+type TimelineEventType =
+  | 'sobriety_start'
+  | 'slip_up'
+  | 'step_completion'
+  | 'milestone'
+  | 'task_completion'
+  | 'task_milestone';
 
 interface TimelineEvent {
   id: string;
@@ -15,7 +31,16 @@ interface TimelineEvent {
   date: Date;
   title: string;
   description: string;
-  icon: 'calendar' | 'check' | 'heart' | 'refresh' | 'award' | 'trending';
+  icon:
+    | 'calendar'
+    | 'check'
+    | 'heart'
+    | 'refresh'
+    | 'award'
+    | 'trending'
+    | 'check-square'
+    | 'list-checks'
+    | 'target';
   color: string;
   metadata?: any;
 }
@@ -102,7 +127,62 @@ export default function JourneyScreen() {
         }
       });
 
-      // 4. Calculate milestones
+      // 4. Fetch completed tasks for timeline
+      const { data: completedTasks, error: tasksError } = await supabase
+        .from('tasks')
+        .select('*')
+        .eq('sponsee_id', profile.id)
+        .eq('status', 'completed')
+        .not('completed_at', 'is', null)
+        .order('completed_at', { ascending: false });
+
+      if (tasksError) throw tasksError;
+
+      // Add task completion events to timeline
+      completedTasks?.forEach((task: Task) => {
+        if (task.completed_at) {
+          timelineEvents.push({
+            id: `task-${task.id}`,
+            type: 'task_completion',
+            date: new Date(task.completed_at),
+            title: task.title,
+            description: task.completion_notes || task.description,
+            icon: 'check-square',
+            color: '#3b82f6', // blue
+            metadata: {
+              taskId: task.id,
+              stepNumber: task.step_number,
+              sponsorId: task.sponsor_id,
+            },
+          });
+        }
+      });
+
+      // 5. Calculate task milestones for timeline
+      if (completedTasks && completedTasks.length > 0) {
+        const milestones = [5, 10, 25, 50, 100, 250, 500];
+        const sortedTasks = [...completedTasks].sort(
+          (a, b) => new Date(a.completed_at!).getTime() - new Date(b.completed_at!).getTime()
+        );
+
+        milestones.forEach(milestoneCount => {
+          if (sortedTasks.length >= milestoneCount) {
+            const milestoneTask = sortedTasks[milestoneCount - 1];
+            timelineEvents.push({
+              id: `task-milestone-${milestoneCount}`,
+              type: 'task_milestone',
+              date: new Date(milestoneTask.completed_at!),
+              title: `${milestoneCount} Tasks Completed`,
+              description: `Reached ${milestoneCount} task completion milestone`,
+              icon: 'award',
+              color: '#f59e0b', // amber/gold
+              metadata: { milestoneCount },
+            });
+          }
+        });
+      }
+
+      // 6. Calculate sobriety milestones
       if (profile.sobriety_date) {
         const sobrietyDate = new Date(profile.sobriety_date);
         const today = new Date();
@@ -165,6 +245,12 @@ export default function JourneyScreen() {
         return <Calendar size={size} color={color} />;
       case 'check':
         return <CheckCircle size={size} color={color} />;
+      case 'check-square':
+        return <CheckSquare size={size} color={color} />;
+      case 'list-checks':
+        return <ListChecks size={size} color={color} />;
+      case 'target':
+        return <Target size={size} color={color} />;
       case 'heart':
         return <Heart size={size} color={color} fill={color} />;
       case 'refresh':
@@ -241,9 +327,16 @@ export default function JourneyScreen() {
                 <Text style={styles.statLabel}>Steps Completed</Text>
               </View>
               <View style={styles.statItem}>
+                <ListChecks size={18} color="#3b82f6" />
+                <Text style={styles.statValue}>
+                  {events.filter(e => e.type === 'task_completion').length}
+                </Text>
+                <Text style={styles.statLabel}>Tasks Completed</Text>
+              </View>
+              <View style={styles.statItem}>
                 <Award size={18} color="#8b5cf6" />
                 <Text style={styles.statValue}>
-                  {events.filter(e => e.type === 'milestone').length}
+                  {events.filter(e => e.type === 'milestone' || e.type === 'task_milestone').length}
                 </Text>
                 <Text style={styles.statLabel}>Milestones</Text>
               </View>
@@ -256,7 +349,7 @@ export default function JourneyScreen() {
             <Heart size={48} color={theme.textTertiary} />
             <Text style={styles.emptyText}>Your journey is just beginning</Text>
             <Text style={styles.emptySubtext}>
-              Complete steps and reach milestones to build your timeline
+              Complete steps, finish tasks, and reach milestones to build your timeline
             </Text>
           </View>
         ) : (
