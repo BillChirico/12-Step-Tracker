@@ -649,6 +649,7 @@ export default function ProfileScreen() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>12-Step Tracker v{packageJson.version}</Text>
         <Text style={styles.footerSubtext}>Supporting recovery, one day at a time</Text>
+        <Text style={styles.footerCredit}>By Bill Chirico</Text>
       </View>
     </ScrollView>
   );
@@ -848,6 +849,14 @@ const createStyles = (theme: any) => StyleSheet.create({
     fontFamily: theme.fontRegular,
     color: theme.textTertiary,
     marginTop: 4,
+  },
+  footerCredit: {
+    fontSize: 11,
+    fontFamily: theme.fontRegular,
+    color: theme.textTertiary,
+    marginTop: 12,
+    fontStyle: 'italic',
+    opacity: 0.7,
   },
   settingsCard: {
     backgroundColor: theme.card,
