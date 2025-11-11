@@ -41,7 +41,9 @@ export default function OnboardingScreen() {
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
     if (selectedDate) {
       setSobrietyDate(selectedDate);
     }
@@ -141,7 +143,7 @@ export default function OnboardingScreen() {
             </Text>
           </TouchableOpacity>
 
-          {showDatePicker && (
+          {(showDatePicker || Platform.OS === 'web') && Platform.OS !== 'web' && (
             <DateTimePicker
               value={sobrietyDate}
               mode="date"
@@ -149,6 +151,27 @@ export default function OnboardingScreen() {
               onChange={onDateChange}
               maximumDate={new Date()}
             />
+          )}
+
+          {Platform.OS === 'web' && showDatePicker && (
+            <View style={styles.webDatePicker}>
+              <input
+                type="date"
+                value={sobrietyDate.toISOString().split('T')[0]}
+                max={new Date().toISOString().split('T')[0]}
+                onChange={(e) => {
+                  setSobrietyDate(new Date(e.target.value));
+                  setShowDatePicker(false);
+                }}
+                style={{
+                  padding: '12px',
+                  fontSize: '16px',
+                  borderRadius: '8px',
+                  border: '2px solid #10b981',
+                  marginBottom: '16px',
+                }}
+              />
+            </View>
           )}
 
           <View style={styles.daysContainer}>
@@ -261,6 +284,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginBottom: 32,
+  },
+  webDatePicker: {
+    marginBottom: 24,
   },
   dateText: {
     fontSize: 18,
