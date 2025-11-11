@@ -16,14 +16,17 @@ export default function TabLayout() {
           backgroundColor: theme.surface,
           borderTopWidth: 1,
           borderTopColor: theme.border,
-          height: Platform.OS === 'web' ? 70 : 'auto',
-          paddingBottom: Platform.OS === 'web' ? 12 : 8,
-          paddingTop: 8,
+          height: Platform.OS === 'web' ? 80 : 'auto',
+          paddingBottom: Platform.OS === 'web' ? 16 : 8,
+          paddingTop: Platform.OS === 'web' ? 12 : 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
+          fontSize: 11,
           fontWeight: '600',
-          marginBottom: Platform.OS === 'web' ? 4 : 0,
+          marginTop: 4,
+        },
+        tabBarIconStyle: {
+          marginBottom: 0,
         },
       }}
     >
