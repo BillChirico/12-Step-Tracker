@@ -75,10 +75,10 @@ export interface Task {
   sponsee?: Profile;
 }
 
-export interface Relapse {
+export interface SlipUp {
   id: string;
   user_id: string;
-  relapse_date: string;
+  slip_up_date: string;
   recovery_restart_date: string;
   notes?: string;
   created_at: string;

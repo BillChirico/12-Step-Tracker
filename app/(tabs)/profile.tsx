@@ -24,13 +24,13 @@ export default function ProfileScreen() {
   });
   const [showSobrietyDatePicker, setShowSobrietyDatePicker] = useState(false);
   const [selectedSobrietyDate, setSelectedSobrietyDate] = useState<Date>(new Date());
-  const [showRelapseModal, setShowRelapseModal] = useState(false);
-  const [relapseDate, setRelapseDate] = useState<Date>(new Date());
+  const [showSlipUpModal, setShowSlipUpModal] = useState(false);
+  const [slipUpDate, setSlipUpDate] = useState<Date>(new Date());
   const [recoveryDate, setRecoveryDate] = useState<Date>(new Date());
-  const [relapseNotes, setRelapseNotes] = useState('');
-  const [showRelapseDatePicker, setShowRelapseDatePicker] = useState(false);
+  const [slipUpNotes, setSlipUpNotes] = useState('');
+  const [showSlipUpDatePicker, setShowSlipUpDatePicker] = useState(false);
   const [showRecoveryDatePicker, setShowRecoveryDatePicker] = useState(false);
-  const [isLoggingRelapse, setIsLoggingRelapse] = useState(false);
+  const [isLoggingSlipUp, setIsLoggingSlipUp] = useState(false);
 
   const fetchRelationships = async () => {
     if (!profile) return;
@@ -429,45 +429,45 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleLogRelapse = () => {
+  const handleLogSlipUp = () => {
     const today = new Date();
-    setRelapseDate(today);
+    setSlipUpDate(today);
     setRecoveryDate(today);
-    setRelapseNotes('');
-    setShowRelapseModal(true);
+    setSlipUpNotes('');
+    setShowSlipUpModal(true);
   };
 
-  const submitRelapse = async () => {
+  const submitSlipUp = async () => {
     if (!profile) return;
 
     const today = new Date();
     today.setHours(23, 59, 59, 999);
 
-    if (relapseDate > today) {
+    if (slipUpDate > today) {
       if (Platform.OS === 'web') {
-        window.alert('Relapse date cannot be in the future');
+        window.alert('Slip up date cannot be in the future');
       } else {
-        Alert.alert('Invalid Date', 'Relapse date cannot be in the future');
+        Alert.alert('Invalid Date', 'Slip up date cannot be in the future');
       }
       return;
     }
 
-    if (recoveryDate < relapseDate) {
+    if (recoveryDate < slipUpDate) {
       if (Platform.OS === 'web') {
-        window.alert('Recovery restart date must be on or after the relapse date');
+        window.alert('Recovery restart date must be on or after the slip up date');
       } else {
-        Alert.alert('Invalid Date', 'Recovery restart date must be on or after the relapse date');
+        Alert.alert('Invalid Date', 'Recovery restart date must be on or after the slip up date');
       }
       return;
     }
 
-    const confirmMessage = 'This will log your relapse and update your sobriety date. Your sponsor will be notified. Continue?';
+    const confirmMessage = 'This will log your slip up and update your sobriety date. Your sponsor will be notified. Continue?';
 
     const confirmed = Platform.OS === 'web'
       ? window.confirm(confirmMessage)
       : await new Promise<boolean>((resolve) => {
           Alert.alert(
-            'Confirm Relapse Log',
+            'Confirm Slip Up Log',
             confirmMessage,
             [
               { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
@@ -478,17 +478,17 @@ export default function ProfileScreen() {
 
     if (!confirmed) return;
 
-    setIsLoggingRelapse(true);
+    setIsLoggingSlipUp(true);
 
     try {
-      const { error: relapseError } = await supabase.from('relapses').insert({
+      const { error: slipUpError } = await supabase.from('slip_ups').insert({
         user_id: profile.id,
-        relapse_date: relapseDate.toISOString().split('T')[0],
+        slip_up_date: slipUpDate.toISOString().split('T')[0],
         recovery_restart_date: recoveryDate.toISOString().split('T')[0],
-        notes: relapseNotes.trim() || null,
+        notes: slipUpNotes.trim() || null,
       });
 
-      if (relapseError) throw relapseError;
+      if (slipUpError) throw slipUpError;
 
       const { error: updateError } = await supabase
         .from('profiles')
@@ -507,31 +507,31 @@ export default function ProfileScreen() {
         const notifications = sponsors.map(rel => ({
           user_id: rel.sponsor_id,
           type: 'milestone',
-          title: 'Sponsee Relapse',
-          content: `${profile.first_name} ${profile.last_initial}. has logged a relapse and restarted their recovery journey.`,
-          data: { sponsee_id: profile.id, relapse_date: relapseDate.toISOString() },
+          title: 'Sponsee Slip Up',
+          content: `${profile.first_name} ${profile.last_initial}. has logged a slip up and restarted their recovery journey.`,
+          data: { sponsee_id: profile.id, slip_up_date: slipUpDate.toISOString() },
         }));
 
         await supabase.from('notifications').insert(notifications);
       }
 
       await refreshProfile();
-      setShowRelapseModal(false);
+      setShowSlipUpModal(false);
 
       if (Platform.OS === 'web') {
-        window.alert('Your relapse has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
+        window.alert('Your slip up has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
       } else {
-        Alert.alert('Relapse Logged', 'Your relapse has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
+        Alert.alert('Slip Up Logged', 'Your slip up has been logged. Remember, recovery is a journey. You are brave for being honest. Keep moving forward, one day at a time.');
       }
     } catch (error: any) {
-      console.error('Error logging relapse:', error);
+      console.error('Error logging slip up:', error);
       if (Platform.OS === 'web') {
-        window.alert('Failed to log relapse. Please try again.');
+        window.alert('Failed to log slip up. Please try again.');
       } else {
-        Alert.alert('Error', 'Failed to log relapse. Please try again.');
+        Alert.alert('Error', 'Failed to log slip up. Please try again.');
       }
     } finally {
-      setIsLoggingRelapse(false);
+      setIsLoggingSlipUp(false);
     }
   };
 
@@ -594,9 +594,9 @@ export default function ProfileScreen() {
             <Edit2 size={16} color={theme.primary} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.relapseButton} onPress={handleLogRelapse}>
+        <TouchableOpacity style={styles.slipUpButton} onPress={handleLogSlipUp}>
           <AlertCircle size={18} color="#ffffff" />
-          <Text style={styles.relapseButtonText}>Log a Relapse</Text>
+          <Text style={styles.slipUpButtonText}>Log a Slip Up</Text>
         </TouchableOpacity>
       </View>
 
@@ -949,22 +949,22 @@ export default function ProfileScreen() {
         </Modal>
       )}
 
-      <Modal visible={showRelapseModal} transparent animationType="slide">
+      <Modal visible={showSlipUpModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={styles.relapseModal}>
-            <Text style={styles.modalTitle}>Log a Relapse</Text>
+          <View style={styles.slipUpModal}>
+            <Text style={styles.modalTitle}>Log a Slip Up</Text>
             <Text style={styles.modalSubtitle}>
-              Recovery is a journey, not a destination. Logging a relapse is an act of courage and honesty.
+              Recovery is a journey, not a destination. Logging a slip up is an act of courage and honesty.
             </Text>
 
             <View style={styles.dateSection}>
-              <Text style={styles.dateLabel}>Relapse Date</Text>
+              <Text style={styles.dateLabel}>Slip Up Date</Text>
               {Platform.OS === 'web' ? (
                 <input
                   type="date"
-                  value={relapseDate.toISOString().split('T')[0]}
+                  value={slipUpDate.toISOString().split('T')[0]}
                   max={new Date().toISOString().split('T')[0]}
-                  onChange={(e) => setRelapseDate(new Date(e.target.value))}
+                  onChange={(e) => setSlipUpDate(new Date(e.target.value))}
                   style={{
                     padding: 12,
                     fontSize: 16,
@@ -977,21 +977,21 @@ export default function ProfileScreen() {
                 <>
                   <TouchableOpacity
                     style={styles.dateButton}
-                    onPress={() => setShowRelapseDatePicker(true)}
+                    onPress={() => setShowSlipUpDatePicker(true)}
                   >
                     <Calendar size={20} color={theme.textSecondary} />
                     <Text style={styles.dateButtonText}>
-                      {relapseDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      {slipUpDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                     </Text>
                   </TouchableOpacity>
-                  {showRelapseDatePicker && (
+                  {showSlipUpDatePicker && (
                     <DateTimePicker
-                      value={relapseDate}
+                      value={slipUpDate}
                       mode="date"
                       display="default"
                       onChange={(event, date) => {
-                        setShowRelapseDatePicker(false);
-                        if (date) setRelapseDate(date);
+                        setShowSlipUpDatePicker(false);
+                        if (date) setSlipUpDate(date);
                       }}
                       maximumDate={new Date()}
                     />
@@ -1006,7 +1006,7 @@ export default function ProfileScreen() {
                 <input
                   type="date"
                   value={recoveryDate.toISOString().split('T')[0]}
-                  min={relapseDate.toISOString().split('T')[0]}
+                  min={slipUpDate.toISOString().split('T')[0]}
                   onChange={(e) => setRecoveryDate(new Date(e.target.value))}
                   style={{
                     padding: 12,
@@ -1036,7 +1036,7 @@ export default function ProfileScreen() {
                         setShowRecoveryDatePicker(false);
                         if (date) setRecoveryDate(date);
                       }}
-                      minimumDate={relapseDate}
+                      minimumDate={slipUpDate}
                     />
                   )}
                 </>
@@ -1049,8 +1049,8 @@ export default function ProfileScreen() {
                 style={styles.notesInput}
                 placeholder="What happened? How are you feeling?"
                 placeholderTextColor={theme.textTertiary}
-                value={relapseNotes}
-                onChangeText={setRelapseNotes}
+                value={slipUpNotes}
+                onChangeText={setSlipUpNotes}
                 multiline
                 numberOfLines={4}
                 textAlignVertical="top"
@@ -1064,20 +1064,20 @@ export default function ProfileScreen() {
             <View style={styles.modalButtons}>
               <TouchableOpacity
                 style={styles.modalCancelButton}
-                onPress={() => setShowRelapseModal(false)}
-                disabled={isLoggingRelapse}
+                onPress={() => setShowSlipUpModal(false)}
+                disabled={isLoggingSlipUp}
               >
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalConfirmButton, styles.relapseConfirmButton, isLoggingRelapse && styles.buttonDisabled]}
-                onPress={submitRelapse}
-                disabled={isLoggingRelapse}
+                style={[styles.modalConfirmButton, styles.slipUpConfirmButton, isLoggingSlipUp && styles.buttonDisabled]}
+                onPress={submitSlipUp}
+                disabled={isLoggingSlipUp}
               >
-                {isLoggingRelapse ? (
+                {isLoggingSlipUp ? (
                   <ActivityIndicator size="small" color="#ffffff" />
                 ) : (
-                  <Text style={styles.modalConfirmText}>Log Relapse</Text>
+                  <Text style={styles.modalConfirmText}>Log Slip Up</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -1186,7 +1186,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderRadius: 8,
     backgroundColor: theme.primaryLight,
   },
-  relapseButton: {
+  slipUpButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -1197,7 +1197,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     marginTop: 20,
     gap: 8,
   },
-  relapseButtonText: {
+  slipUpButtonText: {
     fontSize: 14,
     fontFamily: theme.fontRegular,
     fontWeight: '600',
@@ -1475,7 +1475,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     width: '100%',
     maxWidth: 400,
   },
-  relapseModal: {
+  slipUpModal: {
     backgroundColor: theme.card,
     borderRadius: 16,
     padding: 24,
@@ -1567,7 +1567,7 @@ const createStyles = (theme: any) => StyleSheet.create({
     backgroundColor: theme.primary,
     alignItems: 'center',
   },
-  relapseConfirmButton: {
+  slipUpConfirmButton: {
     backgroundColor: '#ef4444',
   },
   modalConfirmText: {

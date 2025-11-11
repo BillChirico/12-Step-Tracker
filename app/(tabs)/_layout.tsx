@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Home, BookOpen, CheckSquare, MessageCircle, User } from 'lucide-react-native';
+import { Home, BookOpen, TrendingUp, CheckSquare, MessageCircle, User } from 'lucide-react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Platform } from 'react-native';
 
@@ -44,6 +44,13 @@ export default function TabLayout() {
         options={{
           title: 'Steps',
           tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="journey"
+        options={{
+          title: 'Journey',
+          tabBarIcon: ({ color, size }) => <TrendingUp size={size} color={color} />,
         }}
       />
       <Tabs.Screen

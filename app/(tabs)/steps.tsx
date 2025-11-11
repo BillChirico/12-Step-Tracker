@@ -136,38 +136,27 @@ export default function StepsScreen() {
         {!loading && !error && steps.map((step) => {
           const isCompleted = !!progress[step.step_number];
           return (
-            <View key={step.id} style={styles.stepCardContainer}>
-              <TouchableOpacity
-                style={[styles.stepCard, isCompleted && styles.stepCardCompleted]}
-                onPress={() => setSelectedStep(step)}
-              >
-                <View style={[styles.stepNumber, isCompleted && styles.stepNumberCompleted]}>
-                  <Text style={styles.stepNumberText}>{step.step_number}</Text>
-                </View>
-                <View style={styles.stepContent}>
-                  <Text style={styles.stepTitle}>{step.title}</Text>
-                  <Text style={styles.stepDescription} numberOfLines={2}>
-                    {step.description}
-                  </Text>
-                  {isCompleted && (
-                    <View style={styles.completedBadge}>
-                      <CheckCircle size={14} color="#10b981" />
-                      <Text style={styles.completedText}>Completed</Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.checkButton}
-                onPress={() => toggleStepCompletion(step.step_number)}
-              >
-                {isCompleted ? (
-                  <CheckCircle size={28} color="#10b981" fill="#10b981" />
-                ) : (
-                  <Circle size={28} color={theme.textTertiary} />
+            <TouchableOpacity
+              key={step.id}
+              style={[styles.stepCard, isCompleted && styles.stepCardCompleted]}
+              onPress={() => setSelectedStep(step)}
+            >
+              <View style={[styles.stepNumber, isCompleted && styles.stepNumberCompleted]}>
+                <Text style={styles.stepNumberText}>{step.step_number}</Text>
+              </View>
+              <View style={styles.stepContent}>
+                <Text style={styles.stepTitle}>{step.title}</Text>
+                <Text style={styles.stepDescription} numberOfLines={2}>
+                  {step.description}
+                </Text>
+                {isCompleted && (
+                  <View style={styles.completedBadge}>
+                    <CheckCircle size={14} color="#10b981" />
+                    <Text style={styles.completedText}>Completed</Text>
+                  </View>
                 )}
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
           );
         })}
       </ScrollView>
@@ -266,18 +255,12 @@ const createStyles = (theme: any) => StyleSheet.create({
     flex: 1,
     padding: 16,
   },
-  stepCardContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 12,
-  },
   stepCard: {
-    flex: 1,
     flexDirection: 'row',
     backgroundColor: theme.card,
     borderRadius: 16,
     padding: 16,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -299,9 +282,6 @@ const createStyles = (theme: any) => StyleSheet.create({
   },
   stepNumberCompleted: {
     backgroundColor: '#10b981',
-  },
-  checkButton: {
-    padding: 8,
   },
   stepNumberText: {
     fontSize: 20,
