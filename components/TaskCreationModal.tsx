@@ -35,7 +35,7 @@ export default function TaskCreationModal({
   theme,
 }: TaskCreationModalProps) {
   const [selectedSponseeId, setSelectedSponseeId] = useState<string>(preselectedSponseeId || '');
-  const [selectedStepNumber, setSelectedStepNumber] = useState<number>(1);
+  const [selectedStepNumber, setSelectedStepNumber] = useState<number | null>(null);
   const [templates, setTemplates] = useState<TaskTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null);
   const [customTitle, setCustomTitle] = useState('');
@@ -61,6 +61,10 @@ export default function TaskCreationModal({
   }, [visible, selectedStepNumber]);
 
   const fetchTemplates = async () => {
+    if (!selectedStepNumber) {
+      setTemplates([]);
+      return;
+    }
     const { data } = await supabase
       .from('task_templates')
       .select('*')
@@ -97,10 +101,10 @@ export default function TaskCreationModal({
     setIsSubmitting(true);
 
     try {
-      const taskData = {
+      const taskData: any = {
         sponsor_id: sponsorId,
         sponsee_id: selectedSponseeId,
-        step_number: selectedStepNumber,
+        step_number: selectedStepNumber || null,
         title: customTitle.trim(),
         description: customDescription.trim(),
         due_date: dueDate ? dueDate.toISOString().split('T')[0] : null,
@@ -117,7 +121,9 @@ export default function TaskCreationModal({
         user_id: selectedSponseeId,
         type: 'task_assigned',
         title: 'New Task Assigned',
-        content: `Your sponsor has assigned you a new task for Step ${selectedStepNumber}: ${customTitle.trim()}`,
+        content: selectedStepNumber
+          ? `Your sponsor has assigned you a new task for Step ${selectedStepNumber}: ${customTitle.trim()}`
+          : `Your sponsor has assigned you a new task: ${customTitle.trim()}`,
         data: { step_number: selectedStepNumber, task_title: customTitle.trim() },
       });
 
@@ -134,12 +140,15 @@ export default function TaskCreationModal({
 
   const resetForm = () => {
     setSelectedSponseeId(preselectedSponseeId || '');
-    setSelectedStepNumber(1);
+    setSelectedStepNumber(null);
     setSelectedTemplate(null);
     setCustomTitle('');
     setCustomDescription('');
     setDueDate(null);
     setError('');
+    setShowSponseeDropdown(false);
+    setShowStepDropdown(false);
+    setShowTemplateDropdown(false);
   };
 
   const handleClose = () => {
@@ -171,7 +180,11 @@ export default function TaskCreationModal({
               <Text style={styles.label}>Sponsee *</Text>
               <TouchableOpacity
                 style={styles.dropdown}
-                onPress={() => setShowSponseeDropdown(!showSponseeDropdown)}
+                onPress={() => {
+                  setShowSponseeDropdown(!showSponseeDropdown);
+                  setShowStepDropdown(false);
+                  setShowTemplateDropdown(false);
+                }}
               >
                 <Text style={[styles.dropdownText, !selectedSponseeId && styles.placeholderText]}>
                   {selectedSponseeId
@@ -203,16 +216,34 @@ export default function TaskCreationModal({
             </View>
 
             <View style={styles.formGroup}>
-              <Text style={styles.label}>Step Number *</Text>
+              <Text style={styles.label}>Step Number (Optional)</Text>
               <TouchableOpacity
                 style={styles.dropdown}
-                onPress={() => setShowStepDropdown(!showStepDropdown)}
+                onPress={() => {
+                  setShowStepDropdown(!showStepDropdown);
+                  setShowTemplateDropdown(false);
+                  setShowSponseeDropdown(false);
+                }}
               >
-                <Text style={styles.dropdownText}>Step {selectedStepNumber}</Text>
+                <Text style={[styles.dropdownText, !selectedStepNumber && styles.placeholderText]}>
+                  {selectedStepNumber ? `Step ${selectedStepNumber}` : 'Select step (optional)'}
+                </Text>
                 <ChevronDown size={20} color={theme.textSecondary} />
               </TouchableOpacity>
               {showStepDropdown && (
                 <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setSelectedStepNumber(null);
+                      setShowStepDropdown(false);
+                      setSelectedTemplate(null);
+                      setCustomTitle('');
+                      setCustomDescription('');
+                    }}
+                  >
+                    <Text style={[styles.dropdownItemText, { fontStyle: 'italic' }]}>No specific step</Text>
+                  </TouchableOpacity>
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((step) => (
                     <TouchableOpacity
                       key={step}
@@ -235,28 +266,47 @@ export default function TaskCreationModal({
             <View style={styles.formGroup}>
               <Text style={styles.label}>Task Template (Optional)</Text>
               <TouchableOpacity
-                style={styles.dropdown}
-                onPress={() => setShowTemplateDropdown(!showTemplateDropdown)}
+                style={[styles.dropdown, !selectedStepNumber && styles.dropdownDisabled]}
+                onPress={() => {
+                  if (selectedStepNumber) {
+                    setShowTemplateDropdown(!showTemplateDropdown);
+                    setShowSponseeDropdown(false);
+                    setShowStepDropdown(false);
+                  }
+                }}
+                disabled={!selectedStepNumber}
               >
-                <Text style={[styles.dropdownText, !selectedTemplate && styles.placeholderText]}>
-                  {selectedTemplate ? selectedTemplate.title : 'Choose from template or create custom'}
+                <Text style={[styles.dropdownText, styles.placeholderText]}>
+                  {!selectedStepNumber
+                    ? 'Select a step first to see templates'
+                    : selectedTemplate
+                    ? selectedTemplate.title
+                    : 'Choose from template or create custom'}
                 </Text>
                 <ChevronDown size={20} color={theme.textSecondary} />
               </TouchableOpacity>
-              {showTemplateDropdown && (
+              {showTemplateDropdown && selectedStepNumber && (
                 <ScrollView style={styles.dropdownMenuScrollable}>
-                  {templates.map((template) => (
-                    <TouchableOpacity
-                      key={template.id}
-                      style={styles.dropdownItem}
-                      onPress={() => handleTemplateSelect(template)}
-                    >
-                      <Text style={styles.dropdownItemTextBold}>{template.title}</Text>
-                      <Text style={styles.dropdownItemTextSmall} numberOfLines={2}>
-                        {template.description}
+                  {templates.length === 0 ? (
+                    <View style={styles.dropdownItem}>
+                      <Text style={styles.dropdownItemTextSmall}>
+                        No templates available for this step
                       </Text>
-                    </TouchableOpacity>
-                  ))}
+                    </View>
+                  ) : (
+                    templates.map((template) => (
+                      <TouchableOpacity
+                        key={template.id}
+                        style={styles.dropdownItem}
+                        onPress={() => handleTemplateSelect(template)}
+                      >
+                        <Text style={styles.dropdownItemTextBold}>{template.title}</Text>
+                        <Text style={styles.dropdownItemTextSmall} numberOfLines={2}>
+                          {template.description}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  )}
                 </ScrollView>
               )}
             </View>
@@ -404,6 +454,8 @@ const createStyles = (theme: any) =>
     },
     formGroup: {
       marginBottom: 20,
+      position: 'relative',
+      zIndex: 1,
     },
     label: {
       fontSize: 14,
@@ -421,16 +473,25 @@ const createStyles = (theme: any) =>
       borderColor: theme.border,
       borderRadius: 8,
       padding: 12,
+      zIndex: 1,
+    },
+    dropdownDisabled: {
+      opacity: 0.5,
     },
     dropdownText: {
       fontSize: 16,
       fontFamily: theme.fontRegular,
       color: theme.text,
+      flex: 1,
     },
     placeholderText: {
       color: theme.textTertiary,
     },
     dropdownMenu: {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
@@ -441,9 +502,14 @@ const createStyles = (theme: any) =>
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 8,
-      elevation: 5,
+      elevation: 10,
+      zIndex: 1000,
     },
     dropdownMenuScrollable: {
+      position: 'absolute',
+      top: '100%',
+      left: 0,
+      right: 0,
       backgroundColor: theme.card,
       borderWidth: 1,
       borderColor: theme.border,
@@ -454,7 +520,8 @@ const createStyles = (theme: any) =>
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 8,
-      elevation: 5,
+      elevation: 10,
+      zIndex: 1000,
     },
     dropdownItem: {
       padding: 12,
