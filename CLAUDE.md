@@ -317,6 +317,61 @@ See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing guide.
 5. **Row Level Security**: All database operations respect RLS policies - no additional auth checks needed in client code
 6. **Testing Changes**: Use EAS local builds for native testing: `eas build --platform [ios|android] --profile development --local`
 
+## Testing Guidelines
+
+### Test Requirements
+
+All new code must include appropriate tests:
+
+- **Components**: Test user interactions, rendering, and state changes
+- **Contexts**: Test state management and provider behavior
+- **Screens**: Test navigation, form submission, and error handling
+- **Utilities**: Test pure functions and validation logic
+
+### Coverage Requirements
+
+- **Minimum**: 80% coverage for statements, branches, functions, and lines
+- **CI Enforcement**: Coverage thresholds enforced in CI/CD pipeline
+- **Reporting**: Coverage reports uploaded to Codecov on every PR
+
+### Testing Patterns
+
+1. **Use Custom Render**: Import `renderWithProviders` from `test-utils/render` for components that need context
+2. **Mock Supabase**: Use MSW handlers in `mocks/handlers/` for API mocking
+3. **Test User Behavior**: Focus on user interactions, not implementation details
+4. **Fixtures**: Use test data from `test-utils/fixtures/` for consistent test data
+5. **Assertions**: Use React Native Testing Library queries and jest-native matchers
+
+### Test Templates
+
+Use pre-built templates from `docs/templates/`:
+
+- `component.test.template.tsx` - Component testing
+- `hook.test.template.ts` - Custom hook testing
+- `integration.test.template.tsx` - Integration testing
+- `maestro-flow.template.yaml` - E2E flow testing
+
+### Running Tests
+
+```bash
+# Unit tests
+pnpm test              # Run all tests
+pnpm test:watch        # Watch mode for development
+pnpm test -- --coverage # Generate coverage report
+
+# E2E tests
+pnpm maestro           # Run all Maestro flows
+pnpm maestro:record    # Record new flow interactively
+```
+
+### E2E Testing
+
+- **Maestro Flows**: Add E2E tests for critical user journeys
+- **Test IDs**: Add `testID` props to components for reliable E2E selection
+- **Documentation**: Document test scenarios in `.maestro/README.md`
+
+For comprehensive testing guide, see [docs/TESTING.md](docs/TESTING.md).
+
 ## Platform Considerations
 
 - Expo New Architecture enabled (`newArchEnabled: true`)
