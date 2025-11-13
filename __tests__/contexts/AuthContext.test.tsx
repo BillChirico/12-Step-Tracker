@@ -310,6 +310,57 @@ describe('AuthContext', () => {
     });
   });
 
+  describe('signInWithFacebook', () => {
+    describe('web platform', () => {
+      beforeEach(() => {
+        (Platform.OS as any) = 'web';
+      });
+
+      it('should call supabase.auth.signInWithOAuth with facebook provider', async () => {
+        const mockSignInWithOAuth = jest.fn().mockResolvedValue({
+          data: { user: null, session: null },
+          error: null,
+        });
+        (supabase.auth.signInWithOAuth as jest.Mock) = mockSignInWithOAuth;
+
+        const { result } = renderHook(() => useAuth(), {
+          wrapper: AuthProvider,
+        });
+
+        await act(async () => {
+          await result.current.signInWithFacebook();
+        });
+
+        expect(mockSignInWithOAuth).toHaveBeenCalledWith({
+          provider: 'facebook',
+          options: {
+            redirectTo: window.location.origin,
+            scopes: 'email public_profile',
+          },
+        });
+      });
+
+      it('should handle OAuth errors on web', async () => {
+        const mockError = new Error('OAuth failed');
+        const mockSignInWithOAuth = jest.fn().mockResolvedValue({
+          data: { user: null, session: null },
+          error: mockError,
+        });
+        (supabase.auth.signInWithOAuth as jest.Mock) = mockSignInWithOAuth;
+
+        const { result } = renderHook(() => useAuth(), {
+          wrapper: AuthProvider,
+        });
+
+        await expect(
+          act(async () => {
+            await result.current.signInWithFacebook();
+          })
+        ).rejects.toThrow('OAuth failed');
+      });
+    });
+  });
+
   describe('signUp', () => {
     it('should successfully sign up and create profile', async () => {
       (supabase.auth.signUp as jest.Mock).mockResolvedValue({
