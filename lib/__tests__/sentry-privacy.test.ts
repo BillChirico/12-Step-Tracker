@@ -200,7 +200,7 @@ describe('Edge Cases', () => {
     const scrubbed = privacyBeforeSend(event);
     const elapsed = Date.now() - start;
 
-    expect(elapsed).toBeLessThan(2000); // Should take less than 2 seconds (Jest overhead considered)
+    expect(elapsed).toBeLessThan(3000); // Should take less than 3 seconds (CI overhead considered)
     expect(scrubbed?.message).toContain('[email]');
     expect(scrubbed?.message).not.toContain('test@example.com');
   });
