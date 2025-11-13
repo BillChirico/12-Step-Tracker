@@ -15,6 +15,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
   signUp: (
     email: string,
     password: string,
@@ -32,6 +33,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signIn: async () => {},
   signInWithGoogle: async () => {},
+  signInWithFacebook: async () => {},
   signUp: async () => {},
   signOut: async () => {},
   refreshProfile: async () => {},
@@ -198,6 +200,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithFacebook = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'facebook',
+          options: {
+            redirectTo: window.location.origin,
+            scopes: 'email public_profile',
+          },
+        });
+        if (error) throw error;
+      } else {
+        // Native flow - to be implemented
+        throw new Error('Native Facebook Sign In not yet implemented');
+      }
+    } catch (error) {
+      console.error('Facebook sign in error:', error);
+      throw error;
+    }
+  };
+
   const signUp = async (
     email: string,
     password: string,
@@ -236,6 +259,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         signIn,
         signInWithGoogle,
+        signInWithFacebook,
         signUp,
         signOut,
         refreshProfile,

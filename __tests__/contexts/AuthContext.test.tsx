@@ -314,6 +314,7 @@ describe('AuthContext', () => {
     describe('web platform', () => {
       beforeEach(() => {
         (Platform.OS as any) = 'web';
+        global.window = { location: { origin: 'http://localhost:3000' } } as any;
       });
 
       it('should call supabase.auth.signInWithOAuth with facebook provider', async () => {
@@ -334,7 +335,7 @@ describe('AuthContext', () => {
         expect(mockSignInWithOAuth).toHaveBeenCalledWith({
           provider: 'facebook',
           options: {
-            redirectTo: window.location.origin,
+            redirectTo: 'http://localhost:3000',
             scopes: 'email public_profile',
           },
         });
