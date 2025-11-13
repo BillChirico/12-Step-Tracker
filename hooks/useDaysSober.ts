@@ -61,7 +61,7 @@ export function useDaysSober(userId?: string): DaysSoberResult {
 
         setMostRecentSlipUp(data && data.length > 0 ? data[0] : null);
       } catch (err) {
-        setError(err);
+        setError(err as PostgrestError | Error);
       } finally {
         setLoading(false);
       }
