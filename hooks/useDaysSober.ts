@@ -37,6 +37,8 @@ export function useDaysSober(userId?: string): DaysSoberResult {
 
         // Fetch profile if not current user
         if (!isCurrentUser) {
+          setFetchedProfile(null); // Clear old profile first
+
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
@@ -66,7 +68,7 @@ export function useDaysSober(userId?: string): DaysSoberResult {
     }
 
     fetchData();
-  }, [targetUserId, isCurrentUser]);
+  }, [targetUserId, isCurrentUser, profile, user?.id]);
 
   const result = useMemo(() => {
     const sobrietyDate = targetProfile?.sobriety_date;
