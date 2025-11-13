@@ -14,16 +14,17 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Heart } from 'lucide-react-native';
-import { GoogleLogo, FacebookLogo } from '@/components/auth/SocialLogos';
+import { GoogleLogo, FacebookLogo, AppleLogo } from '@/components/auth/SocialLogos';
 
 export default function LoginScreen() {
-  const { theme } = useTheme();
+  const { theme, isDark } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [facebookLoading, setFacebookLoading] = useState(false);
-  const { signIn, signInWithGoogle, signInWithFacebook } = useAuth();
+  const [appleLoading, setAppleLoading] = useState(false);
+  const { signIn, signInWithGoogle, signInWithFacebook, signInWithApple } = useAuth();
   const router = useRouter();
 
   // Refs for field navigation
@@ -83,6 +84,21 @@ export default function LoginScreen() {
     }
   };
 
+  const handleAppleSignIn = async () => {
+    setAppleLoading(true);
+    try {
+      await signInWithApple();
+    } catch (error: any) {
+      if (Platform.OS === 'web') {
+        window.alert('Error: ' + (error.message || 'Failed to sign in with Apple'));
+      } else {
+        Alert.alert('Error', error.message || 'Failed to sign in with Apple');
+      }
+    } finally {
+      setAppleLoading(false);
+    }
+  };
+
   const styles = createStyles(theme);
 
   return (
@@ -134,7 +150,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
-            disabled={loading || googleLoading || facebookLoading}
+            disabled={loading || googleLoading || facebookLoading || appleLoading}
           >
             <Text style={styles.buttonText}>{loading ? 'Signing in...' : 'Sign In'}</Text>
           </TouchableOpacity>
@@ -148,7 +164,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[styles.googleButton, googleLoading && styles.buttonDisabled]}
             onPress={handleGoogleSignIn}
-            disabled={loading || googleLoading || facebookLoading}
+            disabled={loading || googleLoading || facebookLoading || appleLoading}
           >
             {!googleLoading && <GoogleLogo size={20} />}
             <Text style={styles.googleButtonText}>
@@ -159,7 +175,7 @@ export default function LoginScreen() {
           <TouchableOpacity
             style={[styles.facebookButton, facebookLoading && styles.buttonDisabled]}
             onPress={handleFacebookSignIn}
-            disabled={loading || googleLoading || facebookLoading}
+            disabled={loading || googleLoading || facebookLoading || appleLoading}
           >
             {!facebookLoading && <FacebookLogo size={20} />}
             <Text style={styles.facebookButtonText}>
@@ -168,9 +184,20 @@ export default function LoginScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            style={[styles.appleButton, appleLoading && styles.buttonDisabled]}
+            onPress={handleAppleSignIn}
+            disabled={loading || googleLoading || facebookLoading || appleLoading}
+          >
+            {!appleLoading && <AppleLogo size={20} color={isDark ? '#ffffff' : '#000000'} />}
+            <Text style={styles.appleButtonText}>
+              {appleLoading ? 'Signing in with Apple...' : 'Continue with Apple'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
             style={styles.secondaryButton}
             onPress={() => router.push('/signup')}
-            disabled={loading || googleLoading || facebookLoading}
+            disabled={loading || googleLoading || facebookLoading || appleLoading}
           >
             <Text style={styles.secondaryButtonText}>Create New Account</Text>
           </TouchableOpacity>
@@ -297,6 +324,21 @@ const createStyles = (theme: any) =>
     },
     facebookButtonText: {
       color: '#374151',
+      fontSize: 16,
+      fontFamily: theme.fontRegular,
+      fontWeight: '600',
+    },
+    appleButton: {
+      backgroundColor: '#000000',
+      borderRadius: 12,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 12,
+    },
+    appleButtonText: {
+      color: '#ffffff',
       fontSize: 16,
       fontFamily: theme.fontRegular,
       fontWeight: '600',

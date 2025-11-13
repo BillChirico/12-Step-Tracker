@@ -88,6 +88,8 @@ jest.spyOn(Alert, 'alert').mockImplementation(() => {});
 describe('LoginScreen', () => {
   const mockSignIn = jest.fn();
   const mockSignInWithGoogle = jest.fn();
+  const mockSignInWithFacebook = jest.fn();
+  const mockSignInWithApple = jest.fn();
   const mockPush = jest.fn();
 
   beforeEach(() => {
@@ -95,12 +97,16 @@ describe('LoginScreen', () => {
     (useAuth as jest.Mock).mockReturnValue({
       signIn: mockSignIn,
       signInWithGoogle: mockSignInWithGoogle,
+      signInWithFacebook: mockSignInWithFacebook,
+      signInWithApple: mockSignInWithApple,
     });
     (useRouter as jest.Mock).mockReturnValue({
       push: mockPush,
     });
     mockSignIn.mockResolvedValue(undefined);
     mockSignInWithGoogle.mockResolvedValue(undefined);
+    mockSignInWithFacebook.mockResolvedValue(undefined);
+    mockSignInWithApple.mockResolvedValue(undefined);
   });
 
   describe('Rendering', () => {
@@ -486,6 +492,74 @@ describe('LoginScreen', () => {
         },
         { timeout: 200 }
       );
+    });
+  });
+
+  describe('Apple Sign In', () => {
+    it('renders Apple Sign In button', () => {
+      const { getByText } = render(<LoginScreen />);
+      expect(getByText('Continue with Apple')).toBeTruthy();
+    });
+
+    it('calls signInWithApple when button is pressed', async () => {
+      const { getByText } = render(<LoginScreen />);
+      const appleButton = getByText('Continue with Apple');
+
+      fireEvent.press(appleButton);
+
+      await waitFor(() => {
+        expect(mockSignInWithApple).toHaveBeenCalled();
+      });
+    });
+
+    it('shows loading state during Apple sign in', async () => {
+      mockSignInWithApple.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+      const { getByText, queryByText } = render(<LoginScreen />);
+      const appleButton = getByText('Continue with Apple');
+
+      fireEvent.press(appleButton);
+
+      await waitFor(() => {
+        expect(getByText('Signing in with Apple...')).toBeTruthy();
+        expect(queryByText('Continue with Apple')).toBeNull();
+      });
+    });
+
+    it('shows error alert when Apple sign in fails', async () => {
+      mockSignInWithApple.mockRejectedValue(new Error('Apple auth failed'));
+
+      const alertSpy = jest.spyOn(Alert, 'alert');
+
+      const { getByText } = render(<LoginScreen />);
+      const appleButton = getByText('Continue with Apple');
+
+      fireEvent.press(appleButton);
+
+      await waitFor(() => {
+        expect(alertSpy).toHaveBeenCalledWith('Error', 'Apple auth failed');
+      });
+    });
+
+    it('disables Apple button when other auth is in progress', async () => {
+      mockSignIn.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)));
+
+      const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+
+      const emailInput = getByPlaceholderText('your@email.com');
+      const passwordInput = getByPlaceholderText('••••••••');
+      const signInButton = getByText('Sign In');
+
+      // Trigger email/password sign in
+      fireEvent.changeText(emailInput, 'test@example.com');
+      fireEvent.changeText(passwordInput, 'password123');
+      fireEvent.press(signInButton);
+
+      await waitFor(() => {
+        const appleButton = getByText('Signing in...').parent?.parent;
+        // Button should be disabled during other auth
+        expect(appleButton?.props.disabled).toBe(true);
+      });
     });
   });
 });
