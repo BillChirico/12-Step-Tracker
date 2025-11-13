@@ -214,14 +214,14 @@ Display: `"45 days sober"` (simple format for list views)
 
 ## Success Criteria
 
-- [ ] Hook correctly calculates days from recovery_restart_date when slip-ups exist
-- [ ] Hook falls back to sobriety_date when no slip-ups exist
-- [ ] All screens show both journey start date and current streak
-- [ ] Sponsor/sponsee relationships show accurate streak data
-- [ ] All edge cases handled gracefully
-- [ ] Unit test coverage ≥ 80%
-- [ ] Integration tests pass
-- [ ] No performance regressions (queries are efficient)
+- [x] Hook correctly calculates days from recovery_restart_date when slip-ups exist
+- [x] Hook falls back to sobriety_date when no slip-ups exist
+- [x] All screens show both journey start date and current streak
+- [x] Sponsor/sponsee relationships show accurate streak data
+- [x] All edge cases handled gracefully
+- [x] Unit test coverage ≥ 80%
+- [x] Integration tests pass
+- [x] No performance regressions (queries are efficient)
 
 ## Future Enhancements (Out of Scope)
 
