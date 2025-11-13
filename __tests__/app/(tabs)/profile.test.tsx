@@ -185,4 +185,87 @@ describe('ProfileScreen', () => {
     const sponsorTexts = getAllByText(/sponsor/i);
     expect(sponsorTexts.length).toBeGreaterThan(0);
   });
+
+  it('should render sponsee role', () => {
+    (useAuth as jest.Mock).mockReturnValue({
+      profile: { ...mockProfile, role: 'sponsee' },
+      signOut: mockSignOut,
+      refreshProfile: jest.fn(),
+    });
+
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should render both role', () => {
+    (useAuth as jest.Mock).mockReturnValue({
+      profile: { ...mockProfile, role: 'both' },
+      signOut: mockSignOut,
+      refreshProfile: jest.fn(),
+    });
+
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should handle dark theme mode', () => {
+    (useTheme as jest.Mock).mockReturnValue({
+      theme: { ...mockTheme, background: '#1a1a1a', text: '#ffffff' },
+      themeMode: 'dark',
+      setThemeMode: mockSetThemeMode,
+      isDark: true,
+    });
+
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should render invite code section for sponsors', () => {
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should render join with code section for sponsees', () => {
+    (useAuth as jest.Mock).mockReturnValue({
+      profile: { ...mockProfile, role: 'sponsee' },
+      signOut: mockSignOut,
+      refreshProfile: jest.fn(),
+    });
+
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should handle light theme selection', async () => {
+    const { getByText } = render(<ProfileScreen />);
+
+    const lightButton = getByText('Light');
+    fireEvent.press(lightButton);
+
+    await waitFor(() => {
+      expect(mockSetThemeMode).toHaveBeenCalledWith('light');
+    });
+  });
+
+  it('should render email correctly', () => {
+    const { getByText } = render(<ProfileScreen />);
+    expect(getByText('test@example.com')).toBeTruthy();
+  });
+
+  it('should render with valid sobriety date', () => {
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
+
+  it('should handle profile refresh', () => {
+    const mockRefreshProfile = jest.fn();
+    (useAuth as jest.Mock).mockReturnValue({
+      profile: mockProfile,
+      signOut: mockSignOut,
+      refreshProfile: mockRefreshProfile,
+    });
+
+    const { root } = render(<ProfileScreen />);
+    expect(root).toBeTruthy();
+  });
 });

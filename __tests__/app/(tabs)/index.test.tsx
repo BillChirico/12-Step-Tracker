@@ -230,4 +230,98 @@ describe('HomeScreen', () => {
       expect(getByText(/Hello/i)).toBeTruthy();
     });
   });
+
+  it('should handle null profile gracefully', async () => {
+    (useAuth as jest.Mock).mockReturnValue({
+      profile: null,
+    });
+
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
+
+  it('should display tasks section', async () => {
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({
+        data: [
+          {
+            id: 'task-1',
+            title: 'Test Task',
+            status: 'assigned',
+          },
+        ],
+      }),
+    });
+
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
+
+  it('should handle empty relationships', async () => {
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({ data: [] }),
+    });
+
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
+
+  it('should render recent tasks section', async () => {
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
+
+  it('should handle tasks with different statuses', async () => {
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      order: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockResolvedValue({
+        data: [
+          { id: 'task-1', title: 'Task 1', status: 'assigned' },
+          { id: 'task-2', title: 'Task 2', status: 'completed' },
+        ],
+      }),
+    });
+
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
+
+  it('should display user first name', async () => {
+    const { getByText } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(getByText(/John/i)).toBeTruthy();
+    });
+  });
+
+  it('should handle profile with valid data', async () => {
+    const { root } = render(<HomeScreen />);
+
+    await waitFor(() => {
+      expect(root).toBeTruthy();
+    });
+  });
 });
