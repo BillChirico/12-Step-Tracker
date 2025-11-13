@@ -1,16 +1,17 @@
 export default {
   expo: {
     name: '12-Step Tracker',
-    slug: '12-step-tracker',
+    slug: 'twelve-step-tracker',
+    owner: 'billchirico',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: '12stepstracker',
+    scheme: 'twelvesteptracker',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.billchirico.12steptracker',
+      bundleIdentifier: 'com.billchirico.twelvesteptracker',
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
@@ -28,7 +29,7 @@ export default {
         'expo-facebook',
         {
           appID: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
-          displayName: '12 Step Tracker',
+          displayName: '12-Step Tracker',
           scheme: `fb${process.env.EXPO_PUBLIC_FACEBOOK_APP_ID}`,
           advertiserIDCollectionEnabled: false,
           autoLogAppEventsEnabled: false,
