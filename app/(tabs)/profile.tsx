@@ -89,6 +89,49 @@ function SponseeDaysDisplay({
   );
 }
 
+// Component for displaying sponsor days sober using the hook
+function SponsorDaysDisplay({
+  relationship,
+  theme,
+  onDisconnect,
+}: {
+  relationship: any;
+  theme: any;
+  onDisconnect: () => void;
+}) {
+  const { daysSober } = useDaysSober(relationship.sponsor_id);
+
+  return (
+    <View style={createStyles(theme).relationshipCard}>
+      <View style={createStyles(theme).relationshipHeader}>
+        <View style={createStyles(theme).avatar}>
+          <Text style={createStyles(theme).avatarText}>
+            {(relationship.sponsor?.first_name || '?')[0].toUpperCase()}
+          </Text>
+        </View>
+        <View style={createStyles(theme).relationshipInfo}>
+          <Text style={createStyles(theme).relationshipName}>
+            {relationship.sponsor?.first_name} {relationship.sponsor?.last_initial}.
+          </Text>
+          <Text style={createStyles(theme).relationshipMeta}>
+            Connected {new Date(relationship.connected_at).toLocaleDateString()}
+          </Text>
+          {relationship.sponsor?.sobriety_date && (
+            <View style={createStyles(theme).sobrietyInfo}>
+              <Heart size={14} color={theme.primary} fill={theme.primary} />
+              <Text style={createStyles(theme).sobrietyText}>{daysSober} days sober</Text>
+            </View>
+          )}
+        </View>
+      </View>
+      <TouchableOpacity style={createStyles(theme).disconnectButton} onPress={onDisconnect}>
+        <UserMinus size={18} color="#ef4444" />
+        <Text style={createStyles(theme).disconnectText}>Disconnect</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export default function ProfileScreen() {
   const { profile, signOut, refreshProfile } = useAuth();
   const { theme, themeMode, setThemeMode } = useTheme();
@@ -806,52 +849,20 @@ export default function ProfileScreen() {
             <ActivityIndicator size="small" color={theme.primary} />
           </View>
         ) : sponsorRelationships.length > 0 ? (
-          sponsorRelationships.map(rel => {
-            const daysSober = rel.sponsor?.sobriety_date
-              ? Math.floor(
-                  (new Date().getTime() - new Date(rel.sponsor.sobriety_date).getTime()) /
-                    (1000 * 60 * 60 * 24)
+          sponsorRelationships.map(rel => (
+            <SponsorDaysDisplay
+              key={rel.id}
+              relationship={rel}
+              theme={theme}
+              onDisconnect={() =>
+                disconnectRelationship(
+                  rel.id,
+                  false,
+                  `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`
                 )
-              : 0;
-            return (
-              <View key={rel.id} style={styles.relationshipCard}>
-                <View style={styles.relationshipHeader}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {(rel.sponsor?.first_name || '?')[0].toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={styles.relationshipInfo}>
-                    <Text style={styles.relationshipName}>
-                      {rel.sponsor?.first_name} {rel.sponsor?.last_initial}.
-                    </Text>
-                    <Text style={styles.relationshipMeta}>
-                      Connected {new Date(rel.connected_at).toLocaleDateString()}
-                    </Text>
-                    {rel.sponsor?.sobriety_date && (
-                      <View style={styles.sobrietyInfo}>
-                        <Heart size={14} color={theme.primary} fill={theme.primary} />
-                        <Text style={styles.sobrietyText}>{daysSober} days sober</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={styles.disconnectButton}
-                  onPress={() =>
-                    disconnectRelationship(
-                      rel.id,
-                      false,
-                      `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`
-                    )
-                  }
-                >
-                  <UserMinus size={18} color="#ef4444" />
-                  <Text style={styles.disconnectText}>Disconnect</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })
+              }
+            />
+          ))
         ) : (
           <View>
             <Text style={styles.emptyStateText}>No sponsor connected yet</Text>
