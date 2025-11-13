@@ -1,5 +1,5 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "15 - Step Progression and Notes Management"
+appId: com.volvoxllc.twelvesteptracker
+name: '15 - Step Progression and Notes Management'
 ---
 # Test step progression, notes, and reflection features
 # Prerequisites: User must be logged in
@@ -8,44 +8,45 @@ name: "15 - Step Progression and Notes Management"
     clearState: false
 
 # Navigate to Steps tab
-- tapOn: "Steps"
-- assertVisible: "Steps"
+- tapOn: 'Steps'
+- assertVisible: 'Steps'
 
 # Test Step 1 - Basic interaction
 - tapOn:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 - assertVisible:
-    text: "We admitted we were powerless"
+    text: 'We admitted we were powerless'
     optional: true
 
 # Add a reflection note
 - tapOn:
-    text: "Add Note"
+    text: 'Add Note'
     optional: true
 
-- inputText: "Today I reflected on my journey and realized the importance of accepting help from others."
-  id: "note-input"
-  optional: true
+- tapOn:
+    id: 'note-input'
+    optional: true
+- inputText: 'Today I reflected on my journey and realized the importance of accepting help from others.'
 
 - tapOn:
-    text: "Save"
+    text: 'Save'
     optional: true
 
 # Verify note was saved
 - assertVisible:
-    text: "Note saved"
+    text: 'Note saved'
     optional: true
 
 # Mark step as complete
 - tapOn:
-    text: "Mark Complete"
+    text: 'Mark Complete'
     optional: true
 
 # Verify completion
 - assertVisible:
-    text: "Completed"
+    text: 'Completed'
     optional: true
 
 # Navigate back to steps list
@@ -53,28 +54,27 @@ name: "15 - Step Progression and Notes Management"
 
 # Verify step 1 shows as completed
 - assertVisible:
-    text: "✓"
+    text: '✓'
     optional: true
 
 # Test Step 2 - Verify unlocked after Step 1
 - tapOn:
-    text: "Step 2"
+    text: 'Step 2'
     optional: true
 
 - assertVisible:
-    text: "Came to believe"
+    text: 'Came to believe'
     optional: true
 
 # Add note to Step 2
 - tapOn:
-    text: "Add Note"
+    text: 'Add Note'
     optional: true
 
-- inputText: "Exploring faith and hope in my recovery process."
-  optional: true
+- inputText: 'Exploring faith and hope in my recovery process.'
 
 - tapOn:
-    text: "Save"
+    text: 'Save'
     optional: true
 
 # Go back without completing
@@ -82,43 +82,43 @@ name: "15 - Step Progression and Notes Management"
 
 # Test Step 3 - Check if locked (should be locked if step 2 not complete)
 - tapOn:
-    text: "Step 3"
+    text: 'Step 3'
     optional: true
 
 # May show locked state
 - assertVisible:
-    text: "Complete previous steps"
+    text: 'Complete previous steps'
     optional: true
 - back
 
 # View all notes
 - scrollUntilVisible:
     element:
-      text: "View All Notes"
+      text: 'View All Notes'
       optional: true
     direction: DOWN
 
 - tapOn:
-    text: "View All Notes"
+    text: 'View All Notes'
     optional: true
 
 # Verify notes list
 - assertVisible:
-    text: "Your Reflections"
+    text: 'Your Reflections'
     optional: true
 
 # Filter notes by step
 - tapOn:
-    text: "Filter"
+    text: 'Filter'
     optional: true
 
 - tapOn:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 # Verify filtered view
 - assertVisible:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 # Go back to steps list
@@ -127,5 +127,5 @@ name: "15 - Step Progression and Notes Management"
 
 # Verify progress is tracked
 - assertVisible:
-    text: "Progress"
+    text: 'Progress'
     optional: true

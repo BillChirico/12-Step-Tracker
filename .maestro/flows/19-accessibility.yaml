@@ -1,163 +1,192 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "19 - Accessibility and Screen Reader Support"
+appId: com.volvoxllc.twelvesteptracker
+name: '19 - Accessibility and Screen Reader Support'
+
+env:
+  USER_EMAIL: e2e.test@twelvesteptracker.app
+  USER_PASSWORD: TestPassword123!
+
 ---
 # Test accessibility features and screen reader compatibility
 # Prerequisites: User must be logged in
 
-- launchApp:
-    clearState: false
+- launchApp
+
+# ============================================================================
+# LOGIN
+# ============================================================================
+
+- assertVisible: 'Login'
+
+- tapOn:
+    id: 'login-email-input'
+- inputText: '${USER_EMAIL}'
+
+- tapOn:
+    id: 'login-password-input'
+- inputText: '${USER_PASSWORD}'
+
+- tapOn: 'Sign In'
+
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
+    timeout: 10000
+
+# ============================================================================
+# ACCESSIBILITY TESTS
+# ============================================================================
 
 # Test 1: All tabs have accessibility labels
 - assertVisible:
-    id: "home-tab"
+    id: 'home-tab'
     optional: true
 
 - assertVisible:
-    id: "tasks-tab"
+    id: 'tasks-tab'
     optional: true
 
 - assertVisible:
-    id: "steps-tab"
+    id: 'steps-tab'
     optional: true
 
 - assertVisible:
-    id: "journey-tab"
+    id: 'journey-tab'
     optional: true
 
 - assertVisible:
-    id: "profile-tab"
+    id: 'profile-tab'
     optional: true
 
 # Test 2: Navigate with tab order
-- tapOn: "Home"
-- assertVisible: "Home"
+- tapOn: 'Home'
+- assertVisible: 'Home'
 
-- tapOn: "Tasks"
-- assertVisible: "Tasks"
+- tapOn: 'Tasks'
+- assertVisible: 'Tasks'
 
-- tapOn: "Steps"
-- assertVisible: "Steps"
+- tapOn: 'Steps'
+- assertVisible: 'Steps'
 
 # Test 3: Interactive elements have proper labels
 - tapOn:
-    id: "step-card-1"
+    id: 'step-card-1'
     optional: true
 
 - assertVisible:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 - back
 
 # Test 4: Buttons and actions are labeled
-- tapOn: "Tasks"
+- tapOn: 'Tasks'
 
 - tapOn:
-    text: "Create Task"
+    text: 'Create Task'
     optional: true
 
 - assertVisible:
-    id: "task-title-input"
+    id: 'task-title-input'
     optional: true
 
 - assertVisible:
-    id: "task-description-input"
+    id: 'task-description-input'
     optional: true
 
 - back
 
 # Test 5: Form inputs have labels
-- tapOn: "Profile"
+- tapOn: 'Profile'
 
 - scrollUntilVisible:
     element:
-      text: "Sign Out"
+      text: 'Sign Out'
     direction: DOWN
 
-- tapOn: "Sign Out"
+- tapOn: 'Sign Out'
 
 # Login form accessibility
 - assertVisible:
-    id: "email-input"
+    id: 'email-input'
     optional: true
 
 - assertVisible:
-    id: "password-input"
+    id: 'password-input'
     optional: true
 
 # Sign back in
-- tapOn: "Email"
+- tapOn: 'Email'
 - inputText: ${TEST_USER_EMAIL}
-- tapOn: "Password"
+- tapOn: 'Password'
 - inputText: ${TEST_USER_PASSWORD}
-- tapOn: "Sign In"
+- tapOn: 'Sign In'
 
 # Test 6: Error messages are accessible
-- tapOn: "Tasks"
+- tapOn: 'Tasks'
 
 - tapOn:
-    text: "Create Task"
+    text: 'Create Task'
     optional: true
 
 # Try to submit empty form
 - tapOn:
-    text: "Create"
+    text: 'Create'
     optional: true
 
 # Should show accessible error message
 - assertVisible:
-    text: "required"
+    text: 'required'
     optional: true
 
 - back
 
 # Test 7: Status indicators are accessible
-- tapOn: "Steps"
+- tapOn: 'Steps'
 
 - assertVisible:
-    text: "Completed"
+    text: 'Completed'
     optional: true
 
 - assertVisible:
-    text: "In Progress"
+    text: 'In Progress'
     optional: true
 
 # Test 8: Navigation breadcrumbs
 - tapOn:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 - assertVisible:
-    text: "Back"
+    text: 'Back'
     optional: true
 
 - back
 
 # Test 9: Loading states have indicators
-- tapOn: "Journey"
-- assertVisible: "Journey"
+- tapOn: 'Journey'
+- assertVisible: 'Journey'
 
 # Refresh to trigger loading state
-- scroll:
+- swipe:
     direction: DOWN
     duration: 1000
 
 # Should show loading indicator
 - assertVisible:
-    text: "Loading"
+    text: 'Loading'
     optional: true
 
 # Test 10: Success messages are announced
-- tapOn: "Profile"
+- tapOn: 'Profile'
 
 # Any profile action
-- assertVisible: "Profile"
+- assertVisible: 'Profile'
 
 # Test 11: Icon buttons have text alternatives
-- tapOn: "Home"
-- assertVisible: "Home"
+- tapOn: 'Home'
+- assertVisible: 'Home'
 
 # Verify all interactive elements accessible
 - assertVisible:
-    text: "Welcome"
+    text: 'Welcome'
     optional: true

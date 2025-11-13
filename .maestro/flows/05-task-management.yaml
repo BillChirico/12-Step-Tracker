@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   SPONSOR_EMAIL: e2e.sponsor@twelvesteptracker.app
@@ -26,8 +26,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -69,8 +70,9 @@ env:
 - tapOn: 'Create Task'
 
 # Verify task created
-- assertVisible:
-    text: 'Task created successfully'
+- extendedWaitUntil:
+    visible:
+      text: 'Task created successfully'
     timeout: 5000
 
 - assertVisible: 'Test Task for E2E'
@@ -106,8 +108,9 @@ env:
 - tapOn: 'Save Changes'
 
 # Verify update successful
-- assertVisible:
-    text: 'Task updated successfully'
+- extendedWaitUntil:
+    visible:
+      text: 'Task updated successfully'
     timeout: 5000
 
 - assertVisible: 'Updated Test Task'
@@ -162,8 +165,9 @@ env:
     id: 'mark-complete-button'
 
 # Verify completion
-- assertVisible:
-    text: 'Task completed'
+- extendedWaitUntil:
+    visible:
+      text: 'Task completed'
     timeout: 5000
 
 # Verify status changed
@@ -197,8 +201,9 @@ env:
 - tapOn: 'Confirm'
 
 # Verify deletion successful
-- assertVisible:
-    text: 'Task deleted'
+- extendedWaitUntil:
+    visible:
+      text: 'Task deleted'
     timeout: 5000
 
 # Verify task no longer in list
@@ -218,8 +223,9 @@ env:
 - tapOn: 'Create Task'
 
 # Should show validation errors
-- assertVisible:
-    text: 'Title is required'
+- extendedWaitUntil:
+    visible:
+      text: 'Title is required'
     timeout: 3000
 
 # Cancel

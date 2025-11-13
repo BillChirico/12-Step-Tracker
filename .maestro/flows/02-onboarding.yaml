@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   ONBOARDING_EMAIL: e2e.onboarding@twelvesteptracker.app
@@ -36,8 +36,9 @@ env:
 # ONBOARDING - SPONSEE ROLE
 # ============================================================================
 
-- assertVisible:
-    text: 'Welcome to 12-Step Tracker'
+- extendedWaitUntil:
+    visible:
+      text: 'Welcome to 12-Step Tracker'
     timeout: 10000
 
 - assertVisible: 'Select your role to get started'
@@ -51,15 +52,17 @@ env:
 - tapOn: 'Sponsee'
 
 # Verify selection is highlighted/active
-- assertVisible:
-    id: 'role-sponsee-selected'
+- extendedWaitUntil:
+    visible:
+      id: 'role-sponsee-selected'
     timeout: 2000
 
 - tapOn: 'Continue'
 
 # Should show home screen with sponsee-specific content
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 5000
 
 # Verify sponsee sees relevant sections
@@ -95,21 +98,24 @@ env:
 
 - tapOn: 'Sign Up'
 
-- assertVisible:
-    text: 'Welcome to 12-Step Tracker'
+- extendedWaitUntil:
+    visible:
+      text: 'Welcome to 12-Step Tracker'
     timeout: 10000
 
 # Select Sponsor role
 - tapOn: 'Sponsor'
 
-- assertVisible:
-    id: 'role-sponsor-selected'
+- extendedWaitUntil:
+    visible:
+      id: 'role-sponsor-selected'
     timeout: 2000
 
 - tapOn: 'Continue'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 5000
 
 # Verify sponsor sees relevant sections
@@ -145,21 +151,24 @@ env:
 
 - tapOn: 'Sign Up'
 
-- assertVisible:
-    text: 'Welcome to 12-Step Tracker'
+- extendedWaitUntil:
+    visible:
+      text: 'Welcome to 12-Step Tracker'
     timeout: 10000
 
 # Select Both role
 - tapOn: 'Both'
 
-- assertVisible:
-    id: 'role-both-selected'
+- extendedWaitUntil:
+    visible:
+      id: 'role-both-selected'
     timeout: 2000
 
 - tapOn: 'Continue'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 5000
 
 # Verify both role sees all sections

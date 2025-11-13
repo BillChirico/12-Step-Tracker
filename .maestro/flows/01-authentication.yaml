@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   TEST_EMAIL: e2e.test@twelvesteptracker.app
@@ -37,8 +37,9 @@ env:
 - tapOn: 'Sign Up'
 
 # Wait for onboarding screen (confirms account created)
-- assertVisible:
-    text: 'Welcome to 12-Step Tracker'
+- extendedWaitUntil:
+    visible:
+      text: 'Welcome to 12-Step Tracker'
     timeout: 10000
 
 # ============================================================================
@@ -49,8 +50,9 @@ env:
 - tapOn: 'Continue'
 
 # Wait for home screen
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 5000
 
 # ============================================================================
@@ -69,8 +71,9 @@ env:
 - tapOn: 'Sign Out'
 
 # Confirm we're back at login
-- assertVisible:
-    text: 'Login'
+- extendedWaitUntil:
+    visible:
+      text: 'Login'
     timeout: 5000
 
 # ============================================================================
@@ -88,8 +91,9 @@ env:
 - tapOn: 'Sign In'
 
 # Verify successful login
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -117,8 +121,9 @@ env:
 - tapOn: 'Sign In'
 
 # Should show validation error
-- assertVisible:
-    text: 'Invalid email'
+- extendedWaitUntil:
+    visible:
+      text: 'Invalid email'
     timeout: 3000
 
 # Clear and test empty fields
@@ -128,6 +133,7 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Email is required'
+- extendedWaitUntil:
+    visible:
+      text: 'Email is required'
     timeout: 3000

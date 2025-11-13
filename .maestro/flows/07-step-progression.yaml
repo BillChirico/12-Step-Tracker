@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   SPONSEE_EMAIL: e2e.sponsee@twelvesteptracker.app
@@ -26,8 +26,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -100,8 +101,9 @@ env:
     id: 'complete-step-button'
 
 # Verify completion
-- assertVisible:
-    text: 'Step completed'
+- extendedWaitUntil:
+    visible:
+      text: 'Step completed'
     timeout: 5000
 
 # Verify progress updated
@@ -144,9 +146,9 @@ env:
     id: 'progress-indicator'
 
 # Verify progress shows 1/12 steps completed
-- assertVisible:
-    text: '1/12'
-    regex: true
+- extendedWaitUntil:
+    visible:
+      text: '1/12'
     timeout: 3000
 
 # Or check progress percentage
@@ -171,8 +173,9 @@ env:
 - tapOn: 'Step 3'
 
 # Should show message about needing to complete previous steps
-- assertVisible:
-    text: 'Complete previous steps first'
+- extendedWaitUntil:
+    visible:
+      text: 'Complete previous steps first'
     timeout: 3000
 
 # Or might not navigate if locked
@@ -209,8 +212,9 @@ env:
     id: 'save-notes-button'
 
 # Verify notes saved
-- assertVisible:
-    text: 'Notes saved'
+- extendedWaitUntil:
+    visible:
+      text: 'Notes saved'
     timeout: 5000
 
 # Go back

@@ -1,5 +1,5 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "18 - Journey Timeline and Milestones"
+appId: com.volvoxllc.twelvesteptracker
+name: '18 - Journey Timeline and Milestones'
 ---
 # Test journey timeline, milestones, and achievement tracking
 # Prerequisites: User must be logged in with recovery history
@@ -8,96 +8,96 @@ name: "18 - Journey Timeline and Milestones"
     clearState: false
 
 # Navigate to Journey tab
-- tapOn: "Journey"
-- assertVisible: "Your Recovery Timeline"
+- tapOn: 'Journey'
+- assertVisible: 'Your Recovery Timeline'
 
 # Verify sobriety counter
 - assertVisible:
-    text: "Days Sober"
+    text: 'Days Sober'
     optional: true
 
 # Check for milestone celebrations
 - assertVisible:
-    text: "milestone"
+    text: 'milestone'
     optional: true
 
 # Scroll through timeline
-- scroll:
+- swipe:
     direction: DOWN
     duration: 2000
 
 # Verify timeline events
 - assertVisible:
-    text: "Recovery Started"
+    text: 'Recovery Started'
     optional: true
 
 # Look for step completions
 - assertVisible:
-    text: "Step"
+    text: 'Step'
     optional: true
 
 # Look for task completions
 - assertVisible:
-    text: "Task"
+    text: 'Task'
     optional: true
 
 # Test filtering timeline events
 - tapOn:
-    text: "Filter"
+    text: 'Filter'
     optional: true
 
 # Filter by event type - Steps
 - tapOn:
-    text: "Steps"
+    text: 'Steps'
     optional: true
 
 - assertVisible:
-    text: "Step"
+    text: 'Step'
     optional: true
 
 # Change filter to Tasks
 - tapOn:
-    text: "Filter"
+    text: 'Filter'
     optional: true
 
 - tapOn:
-    text: "Tasks"
+    text: 'Tasks'
     optional: true
 
 # Clear filter
 - tapOn:
-    text: "All Events"
+    text: 'All Events'
     optional: true
 
 # Test date range filtering
 - tapOn:
-    text: "Date Range"
+    text: 'Date Range'
     optional: true
 
 - tapOn:
-    text: "Last 7 Days"
+    text: 'Last 7 Days'
     optional: true
 
 # Verify recent events shown
-- assertVisible: "Timeline"
+- assertVisible: 'Timeline'
 
 # Change to last 30 days
 - tapOn:
-    text: "Date Range"
+    text: 'Date Range'
     optional: true
 
 - tapOn:
-    text: "Last 30 Days"
+    text: 'Last 30 Days'
     optional: true
 
 # Test milestone details
 - tapOn:
-    text: "30 Days"
+    text: '30 Days'
     optional: true
 
 # Should show milestone celebration details
 - assertVisible:
-    text: "Congratulations"
+    text: 'Congratulations'
     optional: true
 
 - back
@@ -105,56 +105,56 @@ name: "18 - Journey Timeline and Milestones"
 # Check for encouragement messages
 - scrollUntilVisible:
     element:
-      text: "Keep going"
+      text: 'Keep going'
       optional: true
     direction: DOWN
 
 # Test sharing milestone (if available)
 - tapOn:
-    text: "Share"
+    text: 'Share'
     optional: true
 
 - assertVisible:
-    text: "Share your milestone"
+    text: 'Share your milestone'
     optional: true
 
 - back
 
 # Test statistics view
 - tapOn:
-    text: "Statistics"
+    text: 'Statistics'
     optional: true
 
 # Verify stats displayed
 - assertVisible:
-    text: "Total Steps"
+    text: 'Total Steps'
     optional: true
 
 - assertVisible:
-    text: "Tasks Completed"
+    text: 'Tasks Completed'
     optional: true
 
 - assertVisible:
-    text: "Days Sober"
+    text: 'Days Sober'
     optional: true
 
 # Check for streak information
 - assertVisible:
-    text: "Current Streak"
+    text: 'Current Streak'
     optional: true
 
 # Go back to timeline
 - back
 
 # Test refreshing timeline
-- scroll:
+- swipe:
     direction: DOWN
     duration: 1000
 
-- wait: 2000
+- waitForAnimationToEnd
 
 # Verify timeline refreshed
-- assertVisible: "Your Recovery Timeline"
+- assertVisible: 'Your Recovery Timeline'
 
 # Test event details
 - tapOn:
@@ -163,10 +163,10 @@ name: "18 - Journey Timeline and Milestones"
 
 # Should show event details
 - assertVisible:
-    text: "Details"
+    text: 'Details'
     optional: true
 
 - back
 
 # Return to journey main view
-- assertVisible: "Your Recovery Timeline"
+- assertVisible: 'Your Recovery Timeline'

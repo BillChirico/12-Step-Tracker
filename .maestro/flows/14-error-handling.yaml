@@ -1,104 +1,137 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "14 - Error Handling and Edge Cases"
+appId: com.volvoxllc.twelvesteptracker
+name: '14 - Error Handling and Edge Cases'
+
+env:
+  USER_EMAIL: e2e.test@twelvesteptracker.app
+  USER_PASSWORD: TestPassword123!
+
 ---
 # Test error scenarios and edge case handling
 # Prerequisites: User must be logged in
 
-- launchApp:
-    clearState: false
+- launchApp
+
+# ============================================================================
+# LOGIN
+# ============================================================================
+
+- assertVisible: 'Login'
+
+- tapOn:
+    id: 'login-email-input'
+- inputText: '${USER_EMAIL}'
+
+- tapOn:
+    id: 'login-password-input'
+- inputText: '${USER_PASSWORD}'
+
+- tapOn: 'Sign In'
+
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
+    timeout: 10000
+
+# ============================================================================
+# ERROR HANDLING TESTS
+# ============================================================================
 
 # Test 1: Invalid email format validation
-- tapOn: "Profile"
+- tapOn: 'Profile'
 - scrollUntilVisible:
     element:
-      text: "Sign Out"
+      text: 'Sign Out'
     direction: DOWN
-- tapOn: "Sign Out"
+- tapOn: 'Sign Out'
 
-- tapOn: "Email"
-- inputText: "invalid-email"
-- tapOn: "Password"
-- inputText: "password123"
-- tapOn: "Sign In"
+- tapOn: 'Email'
+- inputText: 'invalid-email'
+- tapOn: 'Password'
+- inputText: 'password123'
+- tapOn: 'Sign In'
 
 # Should show validation error
 - assertVisible:
-    text: "Invalid"
+    text: 'Invalid'
     optional: true
 
 # Clear and try valid credentials
-- clearText:
-    id: "email-input"
+- tapOn:
+    id: 'email-input'
     optional: true
+- eraseText
 - inputText: ${TEST_USER_EMAIL}
-- clearText:
-    id: "password-input"
+- tapOn:
+    id: 'password-input'
     optional: true
+- eraseText
 - inputText: ${TEST_USER_PASSWORD}
-- tapOn: "Sign In"
+- tapOn: 'Sign In'
 
 # Test 2: Network timeout handling (rapid navigation)
-- assertVisible:
-    text: "Home"
+- extendedWaitUntil:
+    visible:
+      text: 'Home'
     timeout: 5000
 
-- tapOn: "Tasks"
-- tapOn: "Steps"
-- tapOn: "Journey"
-- tapOn: "Profile"
-- tapOn: "Home"
+- tapOn: 'Tasks'
+- tapOn: 'Steps'
+- tapOn: 'Journey'
+- tapOn: 'Profile'
+- tapOn: 'Home'
 
 # Verify app remains responsive
-- assertVisible: "Home"
+- assertVisible: 'Home'
 
 # Test 3: Empty state handling
-- tapOn: "Tasks"
-- assertVisible: "Tasks"
+- tapOn: 'Tasks'
+- assertVisible: 'Tasks'
 
 # If no tasks, should show empty state
 - assertVisible:
-    text: "No tasks"
+    text: 'No tasks'
     optional: true
 
 # Test 4: Long text handling (notes/messages)
-- tapOn: "Steps"
+- tapOn: 'Steps'
 - tapOn:
-    text: "Step 1"
+    text: 'Step 1'
     optional: true
 
 # Try to add very long note
 - tapOn:
-    text: "Add Note"
+    text: 'Add Note'
     optional: true
 
-- inputText: "This is a very long note that tests the character limit and text wrapping behavior. It should handle multiple lines gracefully and not cause any layout issues or crashes in the application. Testing edge cases is important for robust mobile applications."
-  optional: true
+- inputText:
+    text: 'This is a very long note that tests the character limit and text wrapping behavior. It should handle multiple lines gracefully and not cause any layout issues or crashes in the application. Testing edge cases is important for robust mobile applications.'
+    optional: true
 
 - tapOn:
-    text: "Save"
+    text: 'Save'
     optional: true
 
 # Test 5: App state preservation (backgrounding)
 - back
 - back
-- tapOn: "Home"
+- tapOn: 'Home'
 
 # Background the app
 - pressKey: Home
-- wait: 2000
+- waitForAnimationToEnd
 
 # Reopen the app
 - launchApp:
     clearState: false
 
 # Verify state preserved
-- assertVisible: "Home"
+- assertVisible: 'Home'
 
 # Test 6: Malformed date handling
-- tapOn: "Profile"
-- assertVisible: "Profile"
+- tapOn: 'Profile'
+- assertVisible: 'Profile'
 
 # Verify app handles missing or invalid dates gracefully
 - assertVisible:
-    text: "Sobriety Start Date"
+    text: 'Sobriety Start Date'
     optional: true

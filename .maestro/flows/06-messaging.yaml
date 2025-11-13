@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   USER1_EMAIL: e2e.user1@twelvesteptracker.app
@@ -28,8 +28,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -74,8 +75,9 @@ env:
     id: 'send-message-button'
 
 # Verify message appears in conversation
-- assertVisible:
-    text: 'Hello! This is a test message from E2E testing.'
+- extendedWaitUntil:
+    visible:
+      text: 'Hello! This is a test message from E2E testing.'
     timeout: 5000
 
 # ============================================================================
@@ -90,8 +92,9 @@ env:
 - tapOn:
     id: 'send-message-button'
 
-- assertVisible:
-    text: 'How are you doing today?'
+- extendedWaitUntil:
+    visible:
+      text: 'How are you doing today?'
     timeout: 3000
 
 # Send third message
@@ -102,8 +105,9 @@ env:
 - tapOn:
     id: 'send-message-button'
 
-- assertVisible:
-    text: 'Looking forward to our next meeting!'
+- extendedWaitUntil:
+    visible:
+      text: 'Looking forward to our next meeting!'
     timeout: 3000
 
 # ============================================================================
@@ -125,8 +129,9 @@ env:
 # ============================================================================
 
 # Messages should have timestamps
-- assertVisible:
-    id: 'message-timestamp'
+- extendedWaitUntil:
+    visible:
+      id: 'message-timestamp'
     timeout: 2000
 
 # ============================================================================
@@ -186,8 +191,9 @@ env:
     id: 'send-message-button'
 
 # Verify long message appears correctly
-- assertVisible:
-    text: 'This is a very long message'
+- extendedWaitUntil:
+    visible:
+      text: 'This is a very long message'
     timeout: 3000
 
 # ============================================================================
@@ -225,7 +231,8 @@ env:
 - tapOn:
     id: 'send-message-button'
 
-- assertVisible:
-    text: 'Testing real-time updates'
+- extendedWaitUntil:
+    visible:
+      text: 'Testing real-time updates'
     timeout: 5000
 # Message should appear immediately without refresh

@@ -1,73 +1,102 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "12 - Dark Mode and Theme Persistence"
+appId: com.volvoxllc.twelvesteptracker
+name: '12 - Dark Mode and Theme Persistence'
+
+env:
+  USER_EMAIL: e2e.test@twelvesteptracker.app
+  USER_PASSWORD: TestPassword123!
+
 ---
 # Test theme switching across all screens with persistence
 # Prerequisites: User must be logged in
 
-- launchApp:
-    clearState: false
+- launchApp
+
+# ============================================================================
+# LOGIN
+# ============================================================================
+
+- assertVisible: 'Login'
+
+- tapOn:
+    id: 'login-email-input'
+- inputText: '${USER_EMAIL}'
+
+- tapOn:
+    id: 'login-password-input'
+- inputText: '${USER_PASSWORD}'
+
+- tapOn: 'Sign In'
+
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
+    timeout: 10000
+
+# ============================================================================
+# THEME SWITCHING TESTS
+# ============================================================================
 
 # Navigate to Profile
-- tapOn: "Profile"
+- tapOn: 'Profile'
 
 # Scroll to theme settings
 - scrollUntilVisible:
     element:
-      text: "Appearance"
+      text: 'Appearance'
     direction: DOWN
 
-- assertVisible: "Appearance"
+- assertVisible: 'Appearance'
 
 # Switch to dark mode
 - tapOn:
-    text: "Dark"
+    text: 'Dark'
     optional: true
 
 # Wait for theme to apply
-- wait: 1000
+- waitForAnimationToEnd
 
 # Verify dark mode applied (check for dark background)
 - takeScreenshot: dark-mode-profile
 
 # Navigate through all tabs to verify dark mode consistency
-- tapOn: "Home"
+- tapOn: 'Home'
 - takeScreenshot: dark-mode-home
-- assertVisible: "Home"
+- assertVisible: 'Home'
 
-- tapOn: "Tasks"
+- tapOn: 'Tasks'
 - takeScreenshot: dark-mode-tasks
-- assertVisible: "Tasks"
+- assertVisible: 'Tasks'
 
-- tapOn: "Steps"
+- tapOn: 'Steps'
 - takeScreenshot: dark-mode-steps
-- assertVisible: "Steps"
+- assertVisible: 'Steps'
 
-- tapOn: "Journey"
+- tapOn: 'Journey'
 - takeScreenshot: dark-mode-journey
-- assertVisible: "Journey"
+- assertVisible: 'Journey'
 
-- tapOn: "Profile"
-- assertVisible: "Profile"
+- tapOn: 'Profile'
+- assertVisible: 'Profile'
 
 # Switch to light mode
 - scrollUntilVisible:
     element:
-      text: "Appearance"
+      text: 'Appearance'
     direction: DOWN
 
 - tapOn:
-    text: "Light"
+    text: 'Light'
     optional: true
 
-- wait: 1000
+- waitForAnimationToEnd
 - takeScreenshot: light-mode-profile
 
 # Switch to system mode
 - tapOn:
-    text: "System"
+    text: 'System'
     optional: true
 
-- wait: 1000
+- waitForAnimationToEnd
 
 # Restart app to verify theme persistence
 - back
@@ -75,13 +104,13 @@ name: "12 - Dark Mode and Theme Persistence"
 - launchApp
 
 # Verify last selected theme persisted
-- tapOn: "Profile"
+- tapOn: 'Profile'
 - scrollUntilVisible:
     element:
-      text: "Appearance"
+      text: 'Appearance'
     direction: DOWN
 
-- assertVisible: "Appearance"
+- assertVisible: 'Appearance'
 
 # Take final screenshot to verify persistence
 - takeScreenshot: theme-persistence-verification

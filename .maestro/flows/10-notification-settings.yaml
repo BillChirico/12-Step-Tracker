@@ -1,5 +1,5 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "10 - Notification Settings Configuration"
+appId: com.volvoxllc.twelvesteptracker
+name: '10 - Notification Settings Configuration'
 ---
 # Test notification preferences configuration and persistence
 # Prerequisites: User must be logged in
@@ -8,34 +8,34 @@ name: "10 - Notification Settings Configuration"
     clearState: false
 
 # Navigate to Profile
-- tapOn: "Profile"
+- tapOn: 'Profile'
 
 # Scroll to notification settings section
 - scrollUntilVisible:
     element:
-      text: "Notification Settings"
+      text: 'Notification Settings'
     direction: DOWN
 
-- assertVisible: "Notification Settings"
+- assertVisible: 'Notification Settings'
 
 # Test toggling task notifications
 - tapOn:
-    id: "notification-toggle-tasks"
+    id: 'notification-toggle-tasks'
     optional: true
 
-# Test toggling message notifications  
+# Test toggling message notifications
 - tapOn:
-    id: "notification-toggle-messages"
+    id: 'notification-toggle-messages'
     optional: true
 
 # Test toggling progress notifications
 - tapOn:
-    id: "notification-toggle-progress"
+    id: 'notification-toggle-progress'
     optional: true
 
 # Test toggling encouragement notifications
 - tapOn:
-    id: "notification-toggle-encouragement"
+    id: 'notification-toggle-encouragement'
     optional: true
 
 # Restart app to verify persistence
@@ -44,15 +44,15 @@ name: "10 - Notification Settings Configuration"
 - launchApp
 
 # Navigate back to Profile to verify settings persisted
-- tapOn: "Profile"
+- tapOn: 'Profile'
 - scrollUntilVisible:
     element:
-      text: "Notification Settings"
+      text: 'Notification Settings'
     direction: DOWN
 
-- assertVisible: "Notification Settings"
+- assertVisible: 'Notification Settings'
 
 # Verify at least one notification setting is visible
 - assertVisible:
-    text: "Tasks"
+    text: 'Tasks'
     optional: true

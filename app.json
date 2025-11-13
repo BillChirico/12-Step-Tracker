@@ -17,6 +17,9 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
+    },
+    "android": {
+      "package": "com.volvoxllc.twelvesteptracker"
     }
   }
 }

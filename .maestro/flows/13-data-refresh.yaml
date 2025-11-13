@@ -1,5 +1,5 @@
-appId: ${EXPO_PUBLIC_APP_ID}
-name: "13 - Data Refresh and Synchronization"
+appId: com.volvoxllc.twelvesteptracker
+name: '13 - Data Refresh and Synchronization'
 ---
 # Test pull-to-refresh functionality across all screens
 # Prerequisites: User must be logged in with some data
@@ -8,66 +8,66 @@ name: "13 - Data Refresh and Synchronization"
     clearState: false
 
 # Test refresh on Home screen
-- tapOn: "Home"
-- assertVisible: "Home"
-- scroll:
+- tapOn: 'Home'
+- assertVisible: 'Home'
+- swipe:
     direction: DOWN
     duration: 1000
-- wait: 2000
-- assertVisible: "Home"
+- waitForAnimationToEnd
+- assertVisible: 'Home'
 
 # Test refresh on Tasks screen
-- tapOn: "Tasks"
-- assertVisible: "Tasks"
-- scroll:
+- tapOn: 'Tasks'
+- assertVisible: 'Tasks'
+- swipe:
     direction: DOWN
     duration: 1000
-- wait: 2000
-- assertVisible: "Tasks"
+- waitForAnimationToEnd
+- assertVisible: 'Tasks'
 
 # Test refresh on Steps screen
-- tapOn: "Steps"
-- assertVisible: "Steps"
-- scroll:
+- tapOn: 'Steps'
+- assertVisible: 'Steps'
+- swipe:
     direction: DOWN
     duration: 1000
-- wait: 2000
-- assertVisible: "Steps"
+- waitForAnimationToEnd
+- assertVisible: 'Steps'
 
 # Test refresh on Journey screen
-- tapOn: "Journey"
-- assertVisible: "Journey"
-- scroll:
+- tapOn: 'Journey'
+- assertVisible: 'Journey'
+- swipe:
     direction: DOWN
     duration: 1000
-- wait: 2000
-- assertVisible: "Your Recovery Timeline"
+- waitForAnimationToEnd
+- assertVisible: 'Your Recovery Timeline'
 
 # Test rapid refresh (stress test)
-- scroll:
+- swipe:
     direction: DOWN
     duration: 500
-- wait: 500
-- scroll:
+- waitForAnimationToEnd
+- swipe:
     direction: DOWN
     duration: 500
-- wait: 500
-- scroll:
+- waitForAnimationToEnd
+- swipe:
     direction: DOWN
     duration: 500
 
 # Verify data consistency after rapid refreshes
-- assertVisible: "Your Recovery Timeline"
+- assertVisible: 'Your Recovery Timeline'
 
 # Test refresh on Profile screen
-- tapOn: "Profile"
-- assertVisible: "Profile"
-- scroll:
+- tapOn: 'Profile'
+- assertVisible: 'Profile'
+- swipe:
     direction: DOWN
     duration: 1000
-- wait: 2000
+- waitForAnimationToEnd
 
 # Verify profile data loaded
 - assertVisible:
-    text: "Email"
+    text: 'Email'
     optional: true

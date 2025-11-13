@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   USER_EMAIL: e2e.profile@twelvesteptracker.app
@@ -27,8 +27,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -84,8 +85,9 @@ env:
 - tapOn: 'Save'
 
 # Verify update successful
-- assertVisible:
-    text: 'Profile updated'
+- extendedWaitUntil:
+    visible:
+      text: 'Profile updated'
     timeout: 5000
 
 # Verify new name is displayed
@@ -112,8 +114,9 @@ env:
 - tapOn: 'Confirm'
 
 # Verify date updated
-- assertVisible:
-    text: 'Sobriety date updated'
+- extendedWaitUntil:
+    visible:
+      text: 'Sobriety date updated'
     timeout: 5000
 
 # ============================================================================
@@ -134,15 +137,17 @@ env:
 
 # Visual verification (screen should change to dark mode)
 # Verify dark theme is applied
-- assertVisible:
-    id: 'dark-theme-indicator'
+- extendedWaitUntil:
+    visible:
+      id: 'dark-theme-indicator'
     timeout: 3000
 
 # Switch to light theme
 - tapOn: 'Light'
 
-- assertVisible:
-    id: 'light-theme-indicator'
+- extendedWaitUntil:
+    visible:
+      id: 'light-theme-indicator'
     timeout: 3000
 
 # Test system theme
@@ -171,8 +176,9 @@ env:
           id: 'task-notifications-toggle'
 
       # Verify setting changed
-      - assertVisible:
-          text: 'Settings updated'
+      - extendedWaitUntil:
+          visible:
+            text: 'Settings updated'
           timeout: 3000
 
       # Toggle back
@@ -250,8 +256,9 @@ env:
       - tapOn: 'Update Password'
 
       # Verify success
-      - assertVisible:
-          text: 'Password updated'
+      - extendedWaitUntil:
+          visible:
+            text: 'Password updated'
           timeout: 5000
 
       # Go back
@@ -307,8 +314,9 @@ env:
       - tapOn: 'Confirm'
 
 # Verify returned to login screen
-- assertVisible:
-    text: 'Login'
+- extendedWaitUntil:
+    visible:
+      text: 'Login'
     timeout: 5000
 
 # ============================================================================
@@ -331,6 +339,7 @@ env:
       - tapOn: 'Sign In'
 
       # Verify successful login
-      - assertVisible:
-          text: 'Dashboard'
+      - extendedWaitUntil:
+          visible:
+            text: 'Dashboard'
           timeout: 10000

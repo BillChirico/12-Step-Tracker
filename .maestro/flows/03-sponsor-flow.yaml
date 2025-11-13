@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   SPONSOR_EMAIL: e2e.sponsor@twelvesteptracker.app
@@ -26,8 +26,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -52,13 +53,15 @@ env:
       visible: 'Generate New Code'
     commands:
       - tapOn: 'Generate New Code'
-      - assertVisible:
-          text: 'Invite code generated'
+      - extendedWaitUntil:
+          visible:
+            text: 'Invite code generated'
           timeout: 5000
 
 # Verify invite code is displayed
-- assertVisible:
-    id: 'invite-code-display'
+- extendedWaitUntil:
+    visible:
+      id: 'invite-code-display'
     timeout: 3000
 
 # ============================================================================
@@ -122,8 +125,9 @@ env:
 - tapOn: 'Create Task'
 
 # Verify task created
-- assertVisible:
-    text: 'Task created successfully'
+- extendedWaitUntil:
+    visible:
+      text: 'Task created successfully'
     timeout: 5000
 
 - assertVisible: 'Complete Step 1 Reading'
@@ -145,7 +149,12 @@ env:
           id: 'start-conversation-button'
       - tapOn:
           id: 'sponsee-list-item-0'
-    else:
+
+- runFlow:
+    when:
+      notVisible:
+        id: 'start-conversation-button'
+    commands:
       # Select existing conversation
       - tapOn:
           id: 'conversation-item-0'
@@ -159,8 +168,9 @@ env:
     id: 'send-message-button'
 
 # Verify message sent
-- assertVisible:
-    text: 'Great job on completing your tasks!'
+- extendedWaitUntil:
+    visible:
+      text: 'Great job on completing your tasks!'
     timeout: 5000
 
 # ============================================================================

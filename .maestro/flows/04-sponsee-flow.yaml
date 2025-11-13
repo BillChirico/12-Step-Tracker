@@ -1,4 +1,4 @@
-appId: com.billchirico.twelvesteptracker
+appId: com.volvoxllc.twelvesteptracker
 
 env:
   SPONSEE_EMAIL: e2e.sponsee@twelvesteptracker.app
@@ -27,8 +27,9 @@ env:
 
 - tapOn: 'Sign In'
 
-- assertVisible:
-    text: 'Dashboard'
+- extendedWaitUntil:
+    visible:
+      text: 'Dashboard'
     timeout: 10000
 
 # ============================================================================
@@ -58,8 +59,9 @@ env:
       - tapOn: 'Connect'
 
       # Verify connection successful
-      - assertVisible:
-          text: 'Connected with sponsor'
+      - extendedWaitUntil:
+          visible:
+            text: 'Connected with sponsor'
           timeout: 5000
 
 # ============================================================================
@@ -104,8 +106,9 @@ env:
           id: 'mark-complete-button'
 
       # Verify completion
-      - assertVisible:
-          text: 'Task completed'
+      - extendedWaitUntil:
+          visible:
+            text: 'Task completed'
           timeout: 5000
 
       # Go back to tasks list
@@ -113,8 +116,9 @@ env:
           id: 'back-button'
 
       # Verify task shows as completed
-      - assertVisible:
-          text: 'Completed'
+      - extendedWaitUntil:
+          visible:
+            text: 'Completed'
           timeout: 3000
 
 # ============================================================================
@@ -132,7 +136,12 @@ env:
     commands:
       - tapOn:
           id: 'sponsor-conversation'
-    else:
+
+- runFlow:
+    when:
+      notVisible:
+        id: 'sponsor-conversation'
+    commands:
       # Start new conversation
       - tapOn:
           id: 'start-conversation-button'
@@ -147,8 +156,9 @@ env:
     id: 'send-message-button'
 
 # Verify message sent
-- assertVisible:
-    text: 'I completed the reading assignment!'
+- extendedWaitUntil:
+    visible:
+      text: 'I completed the reading assignment!'
     timeout: 5000
 
 # ============================================================================
