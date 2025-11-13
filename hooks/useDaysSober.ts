@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import type { SlipUp } from '@/types/database';
+import type { PostgrestError } from '@supabase/supabase-js';
 
 export interface DaysSoberResult {
   daysSober: number;
@@ -9,13 +10,13 @@ export interface DaysSoberResult {
   currentStreakStartDate: string | null;
   hasSlipUps: boolean;
   loading: boolean;
-  error: any;
+  error: PostgrestError | Error | null;
 }
 
 export function useDaysSober(userId?: string): DaysSoberResult {
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<PostgrestError | Error | null>(null);
   const [mostRecentSlipUp, setMostRecentSlipUp] = useState<SlipUp | null>(null);
 
   const targetUserId = userId || user?.id;

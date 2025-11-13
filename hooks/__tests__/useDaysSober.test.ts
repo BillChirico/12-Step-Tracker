@@ -107,4 +107,32 @@ describe('useDaysSober - slip-up fetching', () => {
 
     expect(result.current.hasSlipUps).toBe(false);
   });
+
+  it('should handle fetch errors gracefully', async () => {
+    const mockError = new Error('Database connection failed');
+
+    const mockSelect = jest.fn().mockReturnThis();
+    const mockEq = jest.fn().mockReturnThis();
+    const mockOrder = jest.fn().mockReturnThis();
+    const mockLimit = jest.fn().mockResolvedValue({
+      data: null,
+      error: mockError,
+    });
+
+    (supabase.from as jest.Mock).mockReturnValue({
+      select: mockSelect,
+    });
+    mockSelect.mockReturnValue({ eq: mockEq });
+    mockEq.mockReturnValue({ order: mockOrder });
+    mockOrder.mockReturnValue({ limit: mockLimit });
+
+    const { result } = renderHook(() => useDaysSober());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toEqual(mockError);
+    expect(result.current.hasSlipUps).toBe(false);
+  });
 });
