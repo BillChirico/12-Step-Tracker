@@ -1046,7 +1046,7 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>12-Step Tracker v{packageJson.version}</Text>
+        <Text style={styles.footerText}>Sobriety Waypoint v{packageJson.version}</Text>
         <Text style={styles.footerSubtext}>Supporting recovery, one day at a time</Text>
         <TouchableOpacity onPress={() => Linking.openURL('https://billchirico.dev')}>
           <Text style={styles.footerCredit}>By Bill Chirico</Text>
