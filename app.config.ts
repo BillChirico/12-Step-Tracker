@@ -7,7 +7,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       projectId: 'ca075b23-5398-4570-a6c4-286468f78eb1',
     },
   },
-  name: '12-Step Tracker',
+  name: 'Sobriety Waypoint',
   owner: 'volvox-llc',
   slug: 'twelve-step-tracker',
   scheme: 'twelvesteptracker',
