@@ -49,20 +49,9 @@ export function initializeSentry(): void {
 
       // Performance Monitoring - 100% sampling
       tracesSampleRate: 1.0,
-      enableTracing: true,
 
-      // Integrations
-      // Note: Web doesn't support ReactNativeTracing as it's designed for native performance monitoring
-      integrations:
-        Platform.OS === 'web'
-          ? [] // Web doesn't support ReactNativeTracing
-          : [
-              new Sentry.ReactNativeTracing({
-                tracingOrigins: ['localhost', /^\//],
-                enableUserInteractionTracing: true,
-                enableNativeFramesTracking: true,
-              }),
-            ],
+      // Note: Navigation instrumentation is configured in app/_layout.tsx
+      // using reactNavigationIntegration for Expo Router compatibility
 
       // Privacy hooks
       beforeSend: privacyBeforeSend,

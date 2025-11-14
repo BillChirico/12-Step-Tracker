@@ -2,7 +2,13 @@
 import { initializeSentry } from '@/lib/sentry';
 
 import { useEffect } from 'react';
-import { Stack, useRouter, useSegments, SplashScreen } from 'expo-router';
+import {
+  Stack,
+  useRouter,
+  useSegments,
+  SplashScreen,
+  useNavigationContainerRef,
+} from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
@@ -17,6 +23,12 @@ import {
   JetBrainsMono_700Bold,
 } from '@expo-google-fonts/jetbrains-mono';
 import * as Sentry from '@sentry/react-native';
+import { isRunningInExpoGo } from 'expo';
+
+// Create navigation integration for Expo Router
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay: !isRunningInExpoGo(),
+});
 
 Sentry.init({
   dsn: 'https://e24bf0f5fca4a99552550017f19a3838@o216503.ingest.us.sentry.io/4510359449370624',
@@ -25,16 +37,23 @@ Sentry.init({
   // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
   sendDefaultPii: true,
 
-  // Enable Logs & Traces
+  // Enable Logs
   enableLogs: true,
   enableMetrics: true,
+
+  // Tracing Configuration
   enableUserInteractionTracing: true,
   enableNativeFramesTracking: true,
+  tracesSampleRate: 1.0,
 
   // Configure Session Replay
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+  integrations: [
+    navigationIntegration,
+    Sentry.mobileReplayIntegration(),
+    Sentry.feedbackIntegration(),
+  ],
 
   // Spotlight Configuration
   spotlight: __DEV__,
@@ -49,6 +68,14 @@ function RootLayoutNav() {
   const { isDark } = useTheme();
   const segments = useSegments();
   const router = useRouter();
+  const navigationRef = useNavigationContainerRef();
+
+  // Register navigation container with Sentry
+  useEffect(() => {
+    if (navigationRef) {
+      navigationIntegration.registerNavigationContainer(navigationRef);
+    }
+  }, [navigationRef]);
 
   useEffect(() => {
     if (loading) return;

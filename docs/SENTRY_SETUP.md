@@ -423,12 +423,81 @@ The app is configured for 100% performance sampling:
 ```typescript
 // lib/sentry.ts
 tracesSampleRate: 1.0,  // 100% of transactions
-enableTracing: true,
 ```
 
 This captures all navigation, API calls, and user interactions.
 
-### 8.2 Adjust Sampling (If Needed)
+### 8.2 Expo Router Navigation Instrumentation
+
+The app uses Sentry's Expo Router instrumentation to automatically track navigation performance:
+
+**Configuration** (`app/_layout.tsx`):
+
+```typescript
+import { isRunningInExpoGo } from 'expo';
+import * as Sentry from '@sentry/react-native';
+import { useNavigationContainerRef } from 'expo-router';
+
+// Create navigation integration
+const navigationIntegration = Sentry.reactNavigationIntegration({
+  enableTimeToInitialDisplay: !isRunningInExpoGo(),
+});
+
+// Add to Sentry.init
+Sentry.init({
+  integrations: [
+    navigationIntegration,
+    // ... other integrations
+  ],
+});
+
+// In your root component
+function RootLayoutNav() {
+  const navigationRef = useNavigationContainerRef();
+
+  useEffect(() => {
+    if (navigationRef) {
+      navigationIntegration.registerNavigationContainer(navigationRef);
+    }
+  }, [navigationRef]);
+
+  return <Stack />;
+}
+```
+
+**What it tracks:**
+
+- Route transition performance
+- Time to Initial Display (native builds only)
+- Navigation errors and failures
+- User navigation patterns
+- Slow route renders
+
+**Viewing navigation performance:**
+
+1. In Sentry, go to **Performance** → **Transactions**
+2. Filter by transaction name (route names like `/(tabs)/index`, `/login`, etc.)
+3. View detailed metrics for each route:
+   - Average load time
+   - P50, P75, P95, P99 percentiles
+   - Error rate during navigation
+   - Time to Initial Display (TTID) for native builds
+
+**Time to Initial Display (TTID):**
+
+TTID measures how long it takes for a route to render its initial content. This metric is only available in:
+
+- Native iOS builds
+- Native Android builds
+- **NOT** available in Expo Go or web
+
+To view TTID metrics:
+
+1. Navigate to Performance → Transactions
+2. Click on a specific route transaction
+3. Look for the "Time to Initial Display" metric in the transaction details
+
+### 8.3 Adjust Sampling (If Needed)
 
 If you exceed your transaction quota (10,000/month on free tier):
 
@@ -439,7 +508,7 @@ If you exceed your transaction quota (10,000/month on free tier):
    - `0.1` = 10% sampling
 3. Rebuild and redeploy
 
-### 8.3 Monitor Performance
+### 8.4 Monitor Performance
 
 1. In Sentry, go to **Performance**
 2. Review transaction throughput, response times, and error rates

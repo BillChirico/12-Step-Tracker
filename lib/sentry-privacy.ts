@@ -29,7 +29,7 @@ const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 /**
  * BeforeSend hook to scrub sensitive data from events
  */
-export function privacyBeforeSend(event: Sentry.Event): Sentry.Event | null {
+export function privacyBeforeSend(event: Sentry.ErrorEvent): Sentry.ErrorEvent | null {
   // Strip sensitive request data
   if (event.request?.data) {
     event.request.data = sanitizeObject(event.request.data);

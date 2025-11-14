@@ -86,6 +86,8 @@ This is NOT optional - MCP tools provide significant benefits in efficiency, acc
   - Privacy-first data scrubbing
   - Automatic source map uploads via EAS
   - User context tracking
+  - Expo Router navigation instrumentation for performance tracking
+  - Time to Initial Display metrics (native builds only)
 - **App Icon**: ./assets/images/logo.png
 
 ## Development Commands
@@ -385,6 +387,8 @@ See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing guide.
    - User context automatically set on authentication
    - Privacy scrubbing removes sensitive recovery data (messages, sobriety dates, etc.)
    - Source maps uploaded automatically via sentry-expo plugin
+   - Navigation instrumentation tracks route transitions and performance (app/_layout.tsx)
+   - Time to Initial Display metrics enabled for native builds
    - See [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) for configuration
 
 ## Testing Guidelines
