@@ -139,3 +139,5 @@ eas-build-post-install.sh
 
 # Custom
 build-1763052024252.tar.gz
+
+.env.local

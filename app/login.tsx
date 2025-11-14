@@ -9,12 +9,14 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Button,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Heart } from 'lucide-react-native';
 import { GoogleLogo, FacebookLogo } from '@/components/auth/SocialLogos';
+import * as Sentry from '@sentry/react-native';
 
 export default function LoginScreen() {
   const { theme } = useTheme();

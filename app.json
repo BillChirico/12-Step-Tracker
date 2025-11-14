@@ -20,6 +20,16 @@
     },
     "android": {
       "package": "com.volvoxllc.twelvesteptracker"
-    }
+    },
+    "plugins": [
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "12-step-tracker",
+          "organization": "volvox"
+        }
+      ]
+    ]
   }
 }

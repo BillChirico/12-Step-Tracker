@@ -24,14 +24,4 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: 'com.volvoxllc.twelvesteptracker',
     icon: './assets/images/logo.png',
   },
-  plugins: [
-    ...(config.plugins || []),
-    [
-      'sentry-expo',
-      {
-        organization: process.env.SENTRY_ORG,
-        project: process.env.SENTRY_PROJECT,
-      },
-    ],
-  ],
 });
