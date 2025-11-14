@@ -1,32 +1,33 @@
 {
   "cli": {
-    "version": ">= 16.26.0",
+    "version": ">= 16.27.0",
     "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
       "distribution": "internal",
-      "channel": "preview",
-      "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "$EXPO_PUBLIC_SUPABASE_URL",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "$EXPO_PUBLIC_SUPABASE_ANON_KEY"
-      },
       "ios": {
-        "buildConfiguration": "Release"
-      },
-      "android": {
-        "buildType": "apk"
+        "simulator": true
       }
     },
+    "preview": {
+      "distribution": "internal"
+    },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "APP_ENV": "production"
+      },
+      "channel": "production"
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "ascAppId": "6755243828",
+        "bundleIdentifier": "com.volvoxllc.twelvesteptracker"
+      }
+    }
   }
 }

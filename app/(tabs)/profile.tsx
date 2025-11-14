@@ -17,6 +17,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
+import { useDaysSober } from '@/hooks/useDaysSober';
 import {
   LogOut,
   Heart,
@@ -34,6 +35,103 @@ import {
 } from 'lucide-react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import packageJson from '../../package.json';
+import type { SponsorSponseeRelationship } from '@/types/database';
+
+// Component for displaying sponsee days sober using the hook
+function SponseeDaysDisplay({
+  relationship,
+  theme,
+  onDisconnect,
+  taskStats,
+}: {
+  relationship: SponsorSponseeRelationship;
+  theme: ReturnType<typeof useTheme>['theme'];
+  onDisconnect: () => void;
+  taskStats?: { total: number; completed: number };
+}) {
+  const { daysSober } = useDaysSober(relationship.sponsee_id);
+
+  return (
+    <View style={createStyles(theme).relationshipCard}>
+      <View style={createStyles(theme).relationshipHeader}>
+        <View style={createStyles(theme).avatar}>
+          <Text style={createStyles(theme).avatarText}>
+            {(relationship.sponsee?.first_name || '?')[0].toUpperCase()}
+          </Text>
+        </View>
+        <View style={createStyles(theme).relationshipInfo}>
+          <Text style={createStyles(theme).relationshipName}>
+            {relationship.sponsee?.first_name} {relationship.sponsee?.last_initial}.
+          </Text>
+          <Text style={createStyles(theme).relationshipMeta}>
+            Connected {new Date(relationship.connected_at).toLocaleDateString()}
+          </Text>
+          {relationship.sponsee?.sobriety_date && (
+            <View style={createStyles(theme).sobrietyInfo}>
+              <Heart size={14} color={theme.primary} fill={theme.primary} />
+              <Text style={createStyles(theme).sobrietyText}>{daysSober} days sober</Text>
+            </View>
+          )}
+          {taskStats && (
+            <View style={createStyles(theme).taskStatsInfo}>
+              <CheckCircle size={14} color="#10b981" />
+              <Text style={createStyles(theme).taskStatsText}>
+                {taskStats.completed}/{taskStats.total} tasks completed
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+      <TouchableOpacity style={createStyles(theme).disconnectButton} onPress={onDisconnect}>
+        <UserMinus size={18} color="#ef4444" />
+        <Text style={createStyles(theme).disconnectText}>Disconnect</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// Component for displaying sponsor days sober using the hook
+function SponsorDaysDisplay({
+  relationship,
+  theme,
+  onDisconnect,
+}: {
+  relationship: SponsorSponseeRelationship;
+  theme: ReturnType<typeof useTheme>['theme'];
+  onDisconnect: () => void;
+}) {
+  const { daysSober } = useDaysSober(relationship.sponsor_id);
+
+  return (
+    <View style={createStyles(theme).relationshipCard}>
+      <View style={createStyles(theme).relationshipHeader}>
+        <View style={createStyles(theme).avatar}>
+          <Text style={createStyles(theme).avatarText}>
+            {(relationship.sponsor?.first_name || '?')[0].toUpperCase()}
+          </Text>
+        </View>
+        <View style={createStyles(theme).relationshipInfo}>
+          <Text style={createStyles(theme).relationshipName}>
+            {relationship.sponsor?.first_name} {relationship.sponsor?.last_initial}.
+          </Text>
+          <Text style={createStyles(theme).relationshipMeta}>
+            Connected {new Date(relationship.connected_at).toLocaleDateString()}
+          </Text>
+          {relationship.sponsor?.sobriety_date && (
+            <View style={createStyles(theme).sobrietyInfo}>
+              <Heart size={14} color={theme.primary} fill={theme.primary} />
+              <Text style={createStyles(theme).sobrietyText}>{daysSober} days sober</Text>
+            </View>
+          )}
+        </View>
+      </View>
+      <TouchableOpacity style={createStyles(theme).disconnectButton} onPress={onDisconnect}>
+        <UserMinus size={18} color="#ef4444" />
+        <Text style={createStyles(theme).disconnectText}>Disconnect</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
 
 export default function ProfileScreen() {
   const { profile, signOut, refreshProfile } = useAuth();
@@ -41,8 +139,12 @@ export default function ProfileScreen() {
   const [inviteCode, setInviteCode] = useState('');
   const [showInviteInput, setShowInviteInput] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [sponsorRelationships, setSponsorRelationships] = useState<any[]>([]);
-  const [sponseeRelationships, setSponseeRelationships] = useState<any[]>([]);
+  const [sponsorRelationships, setSponsorRelationships] = useState<SponsorSponseeRelationship[]>(
+    []
+  );
+  const [sponseeRelationships, setSponseeRelationships] = useState<SponsorSponseeRelationship[]>(
+    []
+  );
   const [loadingRelationships, setLoadingRelationships] = useState(true);
   const [notificationSettings, setNotificationSettings] = useState({
     tasks: profile?.notification_preferences?.tasks ?? true,
@@ -114,13 +216,14 @@ export default function ProfileScreen() {
     fetchRelationships();
   }, [profile]);
 
-  const getDaysSober = () => {
-    if (!profile?.sobriety_date) return 0;
-    const sobrietyDate = new Date(profile.sobriety_date);
-    const today = new Date();
-    const diff = today.getTime() - sobrietyDate.getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-  };
+  // Use hook for current user's days sober
+  const {
+    daysSober,
+    journeyStartDate,
+    currentStreakStartDate,
+    hasSlipUps,
+    loading: loadingDaysSober,
+  } = useDaysSober();
 
   const generateInviteCode = async () => {
     if (!profile) return;
@@ -671,20 +774,32 @@ export default function ProfileScreen() {
           <Heart size={24} color={theme.primary} fill={theme.primary} />
           <Text style={styles.sobrietyTitle}>Sobriety Journey</Text>
         </View>
-        <Text style={styles.daysSober}>{getDaysSober()} Days</Text>
+        <Text style={styles.daysSober}>{loadingDaysSober ? '...' : `${daysSober} Days`}</Text>
         <View style={styles.sobrietyDateContainer}>
-          <Text style={styles.sobrietyDate}>
-            Since{' '}
-            {new Date(profile?.sobriety_date || '').toLocaleDateString('en-US', {
+          {journeyStartDate && (
+            <Text style={styles.journeyStartDate}>
+              Journey started:{' '}
+              {new Date(journeyStartDate).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </Text>
+          )}
+          <TouchableOpacity style={styles.editButton} onPress={handleEditSobrietyDate}>
+            <Edit2 size={16} color={theme.primary} />
+          </TouchableOpacity>
+        </View>
+        {hasSlipUps && currentStreakStartDate && (
+          <Text style={styles.currentStreakDate}>
+            Current streak since{' '}
+            {new Date(currentStreakStartDate).toLocaleDateString('en-US', {
               month: 'long',
               day: 'numeric',
               year: 'numeric',
             })}
           </Text>
-          <TouchableOpacity style={styles.editButton} onPress={handleEditSobrietyDate}>
-            <Edit2 size={16} color={theme.primary} />
-          </TouchableOpacity>
-        </View>
+        )}
         <TouchableOpacity style={styles.slipUpButton} onPress={handleLogSlipUp}>
           <AlertCircle size={18} color="#ffffff" />
           <Text style={styles.slipUpButtonText}>Log a Slip Up</Text>
@@ -699,61 +814,21 @@ export default function ProfileScreen() {
           </View>
         ) : sponseeRelationships.length > 0 ? (
           <>
-            {sponseeRelationships.map(rel => {
-              const daysSober = rel.sponsee?.sobriety_date
-                ? Math.floor(
-                    (new Date().getTime() - new Date(rel.sponsee.sobriety_date).getTime()) /
-                      (1000 * 60 * 60 * 24)
+            {sponseeRelationships.map(rel => (
+              <SponseeDaysDisplay
+                key={rel.id}
+                relationship={rel}
+                theme={theme}
+                taskStats={sponseeTaskStats[rel.sponsee_id]}
+                onDisconnect={() =>
+                  disconnectRelationship(
+                    rel.id,
+                    true,
+                    `${rel.sponsee?.first_name} ${rel.sponsee?.last_initial}.`
                   )
-                : 0;
-              return (
-                <View key={rel.id} style={styles.relationshipCard}>
-                  <View style={styles.relationshipHeader}>
-                    <View style={styles.avatar}>
-                      <Text style={styles.avatarText}>
-                        {(rel.sponsee?.first_name || '?')[0].toUpperCase()}
-                      </Text>
-                    </View>
-                    <View style={styles.relationshipInfo}>
-                      <Text style={styles.relationshipName}>
-                        {rel.sponsee?.first_name} {rel.sponsee?.last_initial}.
-                      </Text>
-                      <Text style={styles.relationshipMeta}>
-                        Connected {new Date(rel.connected_at).toLocaleDateString()}
-                      </Text>
-                      {rel.sponsee?.sobriety_date && (
-                        <View style={styles.sobrietyInfo}>
-                          <Heart size={14} color={theme.primary} fill={theme.primary} />
-                          <Text style={styles.sobrietyText}>{daysSober} days sober</Text>
-                        </View>
-                      )}
-                      {sponseeTaskStats[rel.sponsee_id] && (
-                        <View style={styles.taskStatsInfo}>
-                          <CheckCircle size={14} color="#10b981" />
-                          <Text style={styles.taskStatsText}>
-                            {sponseeTaskStats[rel.sponsee_id].completed}/
-                            {sponseeTaskStats[rel.sponsee_id].total} tasks completed
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.disconnectButton}
-                    onPress={() =>
-                      disconnectRelationship(
-                        rel.id,
-                        true,
-                        `${rel.sponsee?.first_name} ${rel.sponsee?.last_initial}.`
-                      )
-                    }
-                  >
-                    <UserMinus size={18} color="#ef4444" />
-                    <Text style={styles.disconnectText}>Disconnect</Text>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
+                }
+              />
+            ))}
             <TouchableOpacity style={styles.actionButton} onPress={generateInviteCode}>
               <Share2 size={20} color={theme.primary} />
               <Text style={styles.actionButtonText}>Generate New Invite Code</Text>
@@ -779,52 +854,20 @@ export default function ProfileScreen() {
             <ActivityIndicator size="small" color={theme.primary} />
           </View>
         ) : sponsorRelationships.length > 0 ? (
-          sponsorRelationships.map(rel => {
-            const daysSober = rel.sponsor?.sobriety_date
-              ? Math.floor(
-                  (new Date().getTime() - new Date(rel.sponsor.sobriety_date).getTime()) /
-                    (1000 * 60 * 60 * 24)
+          sponsorRelationships.map(rel => (
+            <SponsorDaysDisplay
+              key={rel.id}
+              relationship={rel}
+              theme={theme}
+              onDisconnect={() =>
+                disconnectRelationship(
+                  rel.id,
+                  false,
+                  `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`
                 )
-              : 0;
-            return (
-              <View key={rel.id} style={styles.relationshipCard}>
-                <View style={styles.relationshipHeader}>
-                  <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>
-                      {(rel.sponsor?.first_name || '?')[0].toUpperCase()}
-                    </Text>
-                  </View>
-                  <View style={styles.relationshipInfo}>
-                    <Text style={styles.relationshipName}>
-                      {rel.sponsor?.first_name} {rel.sponsor?.last_initial}.
-                    </Text>
-                    <Text style={styles.relationshipMeta}>
-                      Connected {new Date(rel.connected_at).toLocaleDateString()}
-                    </Text>
-                    {rel.sponsor?.sobriety_date && (
-                      <View style={styles.sobrietyInfo}>
-                        <Heart size={14} color={theme.primary} fill={theme.primary} />
-                        <Text style={styles.sobrietyText}>{daysSober} days sober</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={styles.disconnectButton}
-                  onPress={() =>
-                    disconnectRelationship(
-                      rel.id,
-                      false,
-                      `${rel.sponsor?.first_name} ${rel.sponsor?.last_initial}.`
-                    )
-                  }
-                >
-                  <UserMinus size={18} color="#ef4444" />
-                  <Text style={styles.disconnectText}>Disconnect</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })
+              }
+            />
+          ))
         ) : (
           <View>
             <Text style={styles.emptyStateText}>No sponsor connected yet</Text>
@@ -1240,7 +1283,7 @@ export default function ProfileScreen() {
   );
 }
 
-const createStyles = (theme: any) =>
+const createStyles = (theme: ReturnType<typeof useTheme>['theme']) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -1333,6 +1376,18 @@ const createStyles = (theme: any) =>
       fontSize: 14,
       fontFamily: theme.fontRegular,
       color: theme.textSecondary,
+    },
+    journeyStartDate: {
+      fontSize: 14,
+      fontFamily: theme.fontRegular,
+      color: theme.textSecondary,
+    },
+    currentStreakDate: {
+      fontSize: 14,
+      fontFamily: theme.fontRegular,
+      color: theme.text,
+      fontWeight: '500',
+      marginTop: 8,
     },
     editButton: {
       padding: 6,

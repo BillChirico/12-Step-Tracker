@@ -4,7 +4,9 @@ import { supabase } from '@/lib/supabase';
 import { Profile } from '@/types/database';
 import * as WebBrowser from 'expo-web-browser';
 import { makeRedirectUri } from 'expo-auth-session';
+import * as Facebook from 'expo-facebook';
 import { Platform } from 'react-native';
+import { setSentryUser, clearSentryUser, setSentryContext } from '@/lib/sentry';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -15,6 +17,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  signInWithFacebook: () => Promise<void>;
   signUp: (
     email: string,
     password: string,
@@ -32,6 +35,7 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   signIn: async () => {},
   signInWithGoogle: async () => {},
+  signInWithFacebook: async () => {},
   signUp: async () => {},
   signOut: async () => {},
   refreshProfile: async () => {},
@@ -74,6 +78,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  /**
+   * Creates a profile for a new OAuth user if one doesn't exist
+   * Extracts first name and last initial from user metadata
+   */
+  const createOAuthProfileIfNeeded = async (user: User): Promise<void> => {
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!existingProfile) {
+      const nameParts = user.user_metadata?.full_name?.split(' ') || ['User', 'U'];
+      const firstName = nameParts[0] || 'User';
+      const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
+
+      const { error: profileError } = await supabase.from('profiles').insert({
+        id: user.id,
+        email: user.email || '',
+        first_name: firstName,
+        last_initial: lastInitial.toUpperCase(),
+      });
+
+      if (profileError) throw profileError;
+    }
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -92,31 +123,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(session?.user ?? null);
 
       if (session?.user) {
-        const existingProfile = await fetchProfile(session.user.id);
-
-        if (!existingProfile) {
-          const nameParts = session.user.user_metadata?.full_name?.split(' ') || ['User', 'U'];
-          const firstName = nameParts[0] || 'User';
-          const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
-
-          await supabase.from('profiles').insert({
-            id: session.user.id,
-            email: session.user.email || '',
-            first_name: firstName,
-            last_initial: lastInitial.toUpperCase(),
-          });
-
-          await fetchProfile(session.user.id);
-        }
+        await createOAuthProfileIfNeeded(session.user);
+        await fetchProfile(session.user.id);
+        setLoading(false);
       } else {
         setProfile(null);
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Update Sentry context when profile changes
+  useEffect(() => {
+    if (profile) {
+      setSentryUser(profile.id, profile.role);
+      setSentryContext('profile', {
+        role: profile.role,
+      });
+    } else {
+      clearSentryUser();
+    }
+  }, [profile]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -137,9 +166,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
     } else {
       const redirectUrl = makeRedirectUri({
-        scheme: '12stepstracker',
+        scheme: 'twelvesteptracker',
         path: 'auth/callback',
       });
+
+      console.log('[Google Auth] Redirect URL:', redirectUrl);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -152,49 +183,119 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) throw error;
 
       if (data?.url) {
+        console.log('[Google Auth] Opening browser with URL:', data.url);
         const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUrl);
 
+        console.log('[Google Auth] Browser result type:', result.type);
+
         if (result.type === 'success' && result.url) {
+          console.log('[Google Auth] Full redirect URL:', result.url);
+
           const url = new URL(result.url);
+
+          // Log what's in query params
+          console.log(
+            '[Google Auth] Query params access_token:',
+            url.searchParams.get('access_token')
+          );
+          console.log(
+            '[Google Auth] Query params refresh_token:',
+            url.searchParams.get('refresh_token')
+          );
+
+          // Log what's in the hash/fragment
+          console.log('[Google Auth] URL hash:', url.hash);
+
+          // Try extracting from hash
+          const hashParams = new URLSearchParams(url.hash.substring(1)); // Remove leading #
+          console.log('[Google Auth] Hash access_token:', hashParams.get('access_token'));
+          console.log('[Google Auth] Hash refresh_token:', hashParams.get('refresh_token'));
+
           const access_token = url.searchParams.get('access_token');
           const refresh_token = url.searchParams.get('refresh_token');
 
           if (access_token && refresh_token) {
+            console.log('[Google Auth] Tokens found in query params, setting session');
             const { data: sessionData, error: sessionError } = await supabase.auth.setSession({
               access_token,
               refresh_token,
             });
 
-            if (sessionError) throw sessionError;
+            if (sessionError) {
+              console.error('[Google Auth] setSession error:', sessionError);
+              throw sessionError;
+            }
+
+            console.log('[Google Auth] Session created successfully');
 
             if (sessionData.user) {
-              const { data: existingProfile } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', sessionData.user.id)
-                .maybeSingle();
-
-              if (!existingProfile) {
-                const nameParts = sessionData.user.user_metadata?.full_name?.split(' ') || [
-                  'User',
-                  'U',
-                ];
-                const firstName = nameParts[0] || 'User';
-                const lastInitial = nameParts[nameParts.length - 1]?.[0] || 'U';
-
-                const { error: profileError } = await supabase.from('profiles').insert({
-                  id: sessionData.user.id,
-                  email: sessionData.user.email || '',
-                  first_name: firstName,
-                  last_initial: lastInitial.toUpperCase(),
-                });
-
-                if (profileError) throw profileError;
-              }
+              await createOAuthProfileIfNeeded(sessionData.user);
             }
+          } else {
+            console.warn('[Google Auth] No tokens found in query params');
           }
         }
       }
+    }
+  };
+
+  const signInWithFacebook = async () => {
+    try {
+      if (Platform.OS === 'web') {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'facebook',
+          options: {
+            redirectTo: window.location.origin,
+            scopes: 'email public_profile',
+          },
+        });
+        if (error) throw error;
+      } else {
+        // Native flow using expo-facebook
+        const appId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
+        if (!appId) {
+          throw new Error('Facebook App ID not configured');
+        }
+
+        // Initialize Facebook SDK
+        await Facebook.initializeAsync({
+          appId: appId,
+        });
+
+        // Request login with read permissions
+        const result = await Facebook.logInWithReadPermissionsAsync({
+          permissions: ['public_profile', 'email'],
+        });
+
+        if (result.type === 'cancel') {
+          // User cancelled - return gracefully
+          return;
+        }
+
+        if (result.type !== 'success') {
+          throw new Error('Facebook sign in failed');
+        }
+
+        if (!result.token) {
+          throw new Error('No access token received from Facebook');
+        }
+
+        // Exchange Facebook token with Supabase
+        const { data: sessionData, error: sessionError } = await supabase.auth.signInWithIdToken({
+          provider: 'facebook',
+          token: result.token,
+        });
+
+        if (sessionError) throw sessionError;
+
+        // Create profile if needed
+        if (sessionData.user) {
+          await createOAuthProfileIfNeeded(sessionData.user);
+        }
+      }
+    } catch (error) {
+      console.error('Facebook sign in error:', error);
+      throw error;
     }
   };
 
@@ -222,6 +323,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    clearSentryUser();
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     setProfile(null);
@@ -236,6 +338,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         signIn,
         signInWithGoogle,
+        signInWithFacebook,
         signUp,
         signOut,
         refreshProfile,

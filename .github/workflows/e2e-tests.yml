@@ -22,10 +22,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
 
@@ -62,10 +62,22 @@ jobs:
         env:
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_FACEBOOK_APP_ID: ${{ secrets.EXPO_PUBLIC_FACEBOOK_APP_ID }}
 
       - name: Wait for Expo to be ready
         run: |
-          timeout 120 bash -c 'until curl -f http://localhost:8081 2>/dev/null; do echo "Waiting for Expo..."; sleep 3; done' || (echo "Expo failed to start" && exit 1)
+          max_attempts=40
+          attempt=0
+          until curl -f http://localhost:8081 2>/dev/null || [ $attempt -eq $max_attempts ]; do
+            echo "Waiting for Expo... (attempt $((attempt+1))/$max_attempts)"
+            sleep 3
+            attempt=$((attempt+1))
+          done
+          if [ $attempt -eq $max_attempts ]; then
+            echo "Expo failed to start after $((max_attempts*3)) seconds"
+            exit 1
+          fi
+          echo "Expo is ready!"
 
       - name: Setup iOS Simulator
         run: |
@@ -88,7 +100,7 @@ jobs:
 
       - name: Upload Maestro test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: maestro-test-results
           path: |
@@ -98,7 +110,7 @@ jobs:
 
       - name: Upload Maestro logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: maestro-logs
           path: |

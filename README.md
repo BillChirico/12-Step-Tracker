@@ -16,7 +16,11 @@ A React Native mobile application for tracking AA recovery progress and facilita
 - **Sobriety Tracking**: Track sobriety dates and recovery milestones
 - **Relapse Support**: Private relapse tracking and recovery restart functionality
 - **Cross-Platform**: Runs on iOS, Android, and web
-- **Secure Authentication**: Email/password and Google OAuth sign-in
+- **Secure Authentication**: Multiple sign-in options
+  - Email/password authentication
+  - Google OAuth (configured)
+  - Facebook Sign In (configured)
+  - Apple Sign In (planned)
 - **Theme Support**: Light and dark mode with system preference detection
 
 ## Tech Stack
@@ -24,10 +28,46 @@ A React Native mobile application for tracking AA recovery progress and facilita
 - **Framework**: Expo 54 with React Native 0.81.5 and React 19
 - **Router**: Expo Router v6 (file-based routing with typed routes)
 - **Backend**: Supabase (PostgreSQL with Row Level Security)
-- **Authentication**: Supabase Auth (email/password + Google OAuth)
+- **Authentication**: Supabase Auth with multiple providers
+  - Email/password
+  - Google OAuth (see GOOGLE_OAUTH_SETUP.md)
+  - Facebook Sign In (see FACEBOOK_SIGNIN_SETUP.md)
+  - Apple Sign In (planned, design in docs/plans/)
 - **Storage**: expo-secure-store (native) / localStorage (web)
 - **Language**: TypeScript with strict mode
 - **Icons**: lucide-react-native
+
+## Error Tracking
+
+This project uses [Sentry](https://sentry.io) for production error monitoring and crash reporting.
+
+### Features
+
+- 🔒 **Privacy-first**: Automatically scrubs sensitive recovery data (messages, sobriety dates, personal information)
+- 🎯 **Production-only**: Sentry is disabled in development to avoid noise
+- 📊 **Full observability**: Error tracking, performance monitoring, and crash reporting
+- 🗺️ **Source maps**: Automatic upload via EAS builds for readable stack traces
+- 👤 **User context**: Tracks user ID and role for better debugging (no PII)
+
+### Setup
+
+See [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) for complete setup instructions including:
+
+- Creating a Sentry account and project
+- Configuring environment variables
+- Setting up EAS secrets
+- Configuring GitHub Actions
+
+### Environment Variables
+
+For production builds:
+
+```
+EXPO_PUBLIC_SENTRY_DSN=<your-sentry-dsn>
+SENTRY_ORG=<your-sentry-org>
+SENTRY_PROJECT=<your-sentry-project>
+SENTRY_AUTH_TOKEN=<your-sentry-auth-token>
+```
 
 ## Prerequisites
 
@@ -67,6 +107,7 @@ Create a `.env` file in the project root with your Supabase credentials:
 ```env
 EXPO_PUBLIC_SUPABASE_URL=<your-supabase-url>
 EXPO_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+EXPO_PUBLIC_FACEBOOK_APP_ID=<your-facebook-app-id>  # Optional, for Facebook Sign In
 ```
 
 ### 4. Set Up Supabase
@@ -177,12 +218,12 @@ git commit -n
 
 ## Testing
 
-[![Tests](https://github.com/wbchirico/12-Step-Tracker/workflows/CI/badge.svg)](https://github.com/wbchirico/12-Step-Tracker/actions)
-[![Coverage](https://codecov.io/gh/wbchirico/12-Step-Tracker/branch/main/graph/badge.svg)](https://codecov.io/gh/wbchirico/12-Step-Tracker)
+[![Tests](https://github.com/BillChirico/12-Step-Tracker/workflows/CI/badge.svg)](https://github.com/BillChirico/12-Step-Tracker/actions)
+[![Coverage](https://codecov.io/gh/BillChirico/12-Step-Tracker/branch/main/graph/badge.svg)](https://codecov.io/gh/BillChirico/12-Step-Tracker)
 
-Comprehensive testing infrastructure with unit tests, integration tests, and E2E tests. See [docs/TESTING.md](docs/TESTING.md) for complete testing guide.
+This project uses comprehensive testing with unit tests, integration tests, and E2E tests. See [docs/TESTING.md](docs/TESTING.md) for detailed testing guide and best practices.
 
-### Unit and Component Tests
+### Quick Start
 
 ```bash
 # Run all tests
@@ -191,36 +232,81 @@ pnpm test
 # Run tests in watch mode (for development)
 pnpm test:watch
 
-# Run tests in CI mode
-pnpm test:ci
-
 # Run tests with coverage report
-pnpm test:coverage
+pnpm test -- --coverage
+
+# Run specific test file
+pnpm test path/to/test.test.ts
+```
+
+### Unit and Integration Tests
+
+The project uses **Jest** and **React Native Testing Library** for unit and integration testing:
+
+- ✅ **Jest** - Test runner and assertion library
+- ✅ **React Native Testing Library** - Component testing with user-centric queries
+- ✅ **MSW (Mock Service Worker)** - API mocking for Supabase calls
+- ✅ **Custom test utilities** - Helper functions and fixtures in `test-utils/`
+
+**Test Structure:**
+
+```
+__tests__/
+  fixtures/          # Test data factories
+  examples/          # Example test patterns
+  lib/              # Utility tests
+  components/       # Component tests
+mocks/              # MSW handlers and mock database
+test-utils/         # Custom render and helpers
 ```
 
 ### E2E Tests with Maestro
 
-See [.maestro/README.md](.maestro/README.md) for E2E testing documentation.
+The project uses **Maestro** for end-to-end testing on real devices and simulators.
 
 ```bash
 # Run all E2E flows
 pnpm maestro
 
 # Run specific flow
-maestro test .maestro/flows/00-smoke-test.yaml
+maestro test .maestro/flows/01-authentication.yaml
 
 # Record new flow interactively
 pnpm maestro:record
 ```
 
-### Testing Requirements
+See [.maestro/README.md](.maestro/README.md) for E2E testing documentation.
 
-All pull requests must:
+### Coverage Requirements
 
-- Include tests for new features/fixes
-- Maintain or improve code coverage (80% minimum)
-- Pass all unit and E2E tests
-- Follow testing patterns documented in [docs/TESTING.md](docs/TESTING.md)
+The project enforces **80% minimum code coverage**:
+
+- Statements: 80%
+- Branches: 80%
+- Functions: 80%
+- Lines: 80%
+
+Coverage is tracked in CI and reported to [Codecov](https://codecov.io).
+
+### Test Templates
+
+Pre-built test templates are available in `docs/templates/`:
+
+- `component.test.template.tsx` - Component testing
+- `hook.test.template.ts` - Custom hook testing
+- `integration.test.template.tsx` - Integration testing
+- `maestro-flow.template.yaml` - E2E flow testing
+
+### Writing Tests
+
+All new features must include appropriate tests:
+
+- **Components**: Test user interactions, rendering, and state changes
+- **Contexts**: Test state management and provider behavior
+- **Screens**: Test navigation, form submission, and error handling
+- **Utilities**: Test pure functions and validation logic
+
+See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing guide.
 
 ## Project Structure
 
@@ -254,7 +340,11 @@ The app enforces a strict navigation flow:
 3. **Authenticated with incomplete profile** → `/onboarding`
 4. **Fully set up users** → `/(tabs)` (main app)
 
-## Google OAuth Setup
+## OAuth and Social Sign In Setup
+
+The app supports multiple authentication providers beyond email/password:
+
+### Google OAuth
 
 Google Sign-In is integrated but requires additional configuration. See `GOOGLE_OAUTH_SETUP.md` for detailed setup instructions including:
 
@@ -262,6 +352,19 @@ Google Sign-In is integrated but requires additional configuration. See `GOOGLE_
 - Supabase provider setup
 - OAuth redirect URIs
 - Mobile deep linking configuration
+
+### Facebook Sign In
+
+Facebook Sign In is integrated but requires additional configuration. See `FACEBOOK_SIGNIN_SETUP.md` for detailed setup instructions including:
+
+- Facebook App creation and configuration
+- Supabase provider setup
+- Native app configuration (iOS/Android)
+- Environment variable setup
+
+### Apple Sign In
+
+Apple Sign In design is complete and implementation is planned. See `docs/plans/2025-11-12-apple-signin-design.md` for the implementation plan.
 
 **App Details:**
 
@@ -401,11 +504,14 @@ For the build jobs to work, configure these secrets in your GitHub repository se
 
 ## Additional Documentation
 
-- `CLAUDE.md` - Detailed project architecture and code patterns
+- `CLAUDE.md` - Detailed project architecture, MCP server usage, and code patterns
 - `GOOGLE_OAUTH_SETUP.md` - Google OAuth configuration guide
+- `FACEBOOK_SIGNIN_SETUP.md` - Facebook Sign In configuration guide
+- `docs/TESTING.md` - Comprehensive testing guide and best practices
 - `.github/CICD.md` - Comprehensive CI/CD documentation including Claude Code Review
 - `.github/GIT_HOOKS.md` - Git hooks setup and troubleshooting guide
 - `supabase/migrations/` - Database schema and RLS policies
+- `docs/plans/` - Design documents for features (including Apple Sign In)
 - `.github/workflows/ci.yml` - Main CI/CD pipeline configuration
 - `.github/workflows/claude-code-review.yml` - AI code review workflow configuration
 

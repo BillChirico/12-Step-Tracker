@@ -21,19 +21,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Serena** (`mcp__serena__*`): Semantic code navigation and editing with symbol-based operations
   - Use for: Finding symbols, searching code patterns, editing code by symbol, understanding code structure
   - Prefer this over reading entire files
+  - Key tools: `find_symbol`, `get_symbols_overview`, `replace_symbol_body`, `find_referencing_symbols`, `search_for_pattern`
 
 - **Memory Keeper** (`mcp__memory-keeper__*`): Context and session management with git tracking
-  - Use for: Saving project context, tracking decisions, managing development sessions
+  - Use for: Saving project context, tracking decisions, managing development sessions, creating checkpoints
+  - Key tools: `context_save`, `context_get`, `context_checkpoint`, `context_search`, `context_timeline`
+  - Supports channels, categories, priorities, and relationships between context items
 
-- **Fetch** (`mcp__fetch__*`): Advanced web content fetching with image support
+- **Brave Search** (`mcp__MCP_DOCKER__brave_*`): Comprehensive search engine capabilities
+  - Use for: Web search, news articles, image search, video search, local business search
+  - Key tools: `brave_web_search`, `brave_news_search`, `brave_image_search`, `brave_video_search`, `brave_local_search`
+  - **brave_summarizer**: AI-generated summaries of web search results (requires Pro AI subscription)
+
+- **Expo MCP** (`mcp__expo-mcp__*`): Expo framework-specific development tools
+  - Use for: Adding Expo libraries, searching Expo documentation, generating project documentation
+  - Key tools: `add_library`, `search_documentation`, `generate_agents_md`, `generate_claude_md`, `learn`
+  - **Always use** `search_documentation` for Expo-specific questions before implementing solutions
+
+- **Fetch** (`mcp__MCP_DOCKER__fetch`): Advanced web content fetching with markdown conversion
   - Use for: Fetching web content, extracting images, converting HTML to Markdown
+  - Supports raw HTML or simplified markdown output
 
 - **ToolHive** (`mcp__toolhive-mcp-optimizer__*`): Tool discovery and execution optimization
   - **Use this FIRST** when you need to find the right tool for a task
   - Functions: `find_tool`, `call_tool`, `list_tools`
+  - Provides token efficiency metrics showing savings from tool filtering
 
 - **Sequential Thinking** (`mcp__sequential-thinking__*`): Complex problem-solving with chain-of-thought reasoning
-  - Use for: Breaking down complex problems, planning multi-step solutions
+  - Use for: Breaking down complex problems, planning multi-step solutions, hypothesis generation and verification
+  - Supports dynamic thought adjustment, revision of previous thinking, and branching
+
+- **MCP Management** (`mcp__MCP_DOCKER__mcp-*`): Dynamic MCP server management
+  - Use for: Adding/removing MCP servers at runtime, configuring servers, discovering available servers
+  - Key tools: `mcp-find`, `mcp-add`, `mcp-remove`, `mcp-config-set`
 
 ### Example Workflow
 
@@ -53,10 +73,22 @@ This is NOT optional - MCP tools provide significant benefits in efficiency, acc
 - **Framework**: Expo 54 with React Native 0.81.5 and React 19
 - **Router**: Expo Router v6 (file-based routing with typed routes)
 - **Backend**: Supabase (PostgreSQL with Row Level Security)
-- **Authentication**: Supabase Auth (email/password + Google OAuth)
+- **Authentication**: Supabase Auth with multiple providers
+  - Email/password authentication
+  - Google OAuth (configured, see GOOGLE_OAUTH_SETUP.md)
+  - Facebook Sign In (configured, see FACEBOOK_SIGNIN_SETUP.md)
+  - Apple Sign In (design complete, implementation pending, see docs/plans/2025-11-12-apple-signin-design.md)
 - **Storage**: expo-secure-store (native) / localStorage (web)
 - **Language**: TypeScript with strict mode
 - **Icons**: lucide-react-native
+- **Error Tracking**: Sentry for production error monitoring
+  - Production-only initialization (disabled in development)
+  - Privacy-first data scrubbing
+  - Automatic source map uploads via EAS
+  - User context tracking
+  - Expo Router navigation instrumentation for performance tracking
+  - Time to Initial Display metrics (native builds only)
+- **App Icon**: ./assets/images/logo.png
 
 ## Development Commands
 
@@ -105,7 +137,9 @@ The root layout (`app/_layout.tsx`) enforces a strict navigation flow:
 - Manages Supabase session and user state
 - Handles sign in/up/out operations
 - Provides Google OAuth integration (see GOOGLE_OAUTH_SETUP.md)
-- Auto-creates profiles for new users
+- Provides Facebook Sign In integration (see FACEBOOK_SIGNIN_SETUP.md)
+- Apple Sign In support planned (design complete, see docs/plans/2025-11-12-apple-signin-design.md)
+- Auto-creates profiles for new OAuth users
 - Exposes: `session`, `user`, `profile`, `loading`, auth methods
 
 **ThemeContext** (`contexts/ThemeContext.tsx`):
@@ -167,6 +201,22 @@ Key details:
 - Package name (Android): `com.billchirico.twelvesteptracker`
 - OAuth implementation in `AuthContext.tsx` handles both web and native flows
 
+## Facebook Sign In Setup
+
+Facebook Sign In is integrated and requires configuration. See `FACEBOOK_SIGNIN_SETUP.md` for:
+- Facebook App creation and configuration
+- Supabase provider setup
+- OAuth redirect URI configuration
+- Native app configuration (iOS/Android)
+- Environment variable setup
+
+Key details:
+- Bundle ID (iOS): `com.billchirico.12steptracker`
+- Package name (Android): `com.billchirico.twelvesteptracker`
+- Required environment variable: `EXPO_PUBLIC_FACEBOOK_APP_ID`
+- Implementation in `AuthContext.tsx` handles both web (OAuth) and native (expo-facebook SDK) flows
+- Auto-creates user profiles on first sign-in with name extracted from Facebook profile
+
 ## EAS Build Configuration
 
 Configuration in `eas.json`:
@@ -176,7 +226,10 @@ Configuration in `eas.json`:
   - iOS: Release build configuration
   - Android: APK build type
   - Includes Supabase environment variables
-- **production**: Auto-increment version numbers
+- **production**: Production builds with automatic version increment
+  - Auto-increment version numbers
+  - Environment: `APP_ENV=production`
+  - OTA update channel: `production`
 
 EAS project ID: `4652ad8b-2e44-4270-8612-64c4587219d8`
 
@@ -234,7 +287,20 @@ Required environment variables (not committed):
 ```
 EXPO_PUBLIC_SUPABASE_URL=<your-supabase-url>
 EXPO_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+EXPO_PUBLIC_FACEBOOK_APP_ID=<your-facebook-app-id>
 ```
+
+### Sentry Configuration (Production Only)
+
+Required for production builds and EAS:
+```
+EXPO_PUBLIC_SENTRY_DSN=<your-sentry-dsn>
+SENTRY_ORG=<your-sentry-org>
+SENTRY_PROJECT=<your-sentry-project>
+SENTRY_AUTH_TOKEN=<your-sentry-auth-token>
+```
+
+See [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) for complete setup instructions.
 
 ## Development Workflow
 
@@ -316,6 +382,69 @@ See [docs/TESTING.md](docs/TESTING.md) for comprehensive testing guide.
 4. **Cross-platform Storage**: Use the adapter pattern (see `lib/supabase.ts`) for platform-specific storage
 5. **Row Level Security**: All database operations respect RLS policies - no additional auth checks needed in client code
 6. **Testing Changes**: Use EAS local builds for native testing: `eas build --platform [ios|android] --profile development --local`
+7. **Error Tracking**: All errors are automatically captured by Sentry in production
+   - ErrorBoundary wraps the entire app for crash reporting
+   - User context automatically set on authentication
+   - Privacy scrubbing removes sensitive recovery data (messages, sobriety dates, etc.)
+   - Source maps uploaded automatically via sentry-expo plugin
+   - Navigation instrumentation tracks route transitions and performance (app/_layout.tsx)
+   - Time to Initial Display metrics enabled for native builds
+   - See [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) for configuration
+
+## Testing Guidelines
+
+### Test Requirements
+
+All new code must include appropriate tests:
+
+- **Components**: Test user interactions, rendering, and state changes
+- **Contexts**: Test state management and provider behavior
+- **Screens**: Test navigation, form submission, and error handling
+- **Utilities**: Test pure functions and validation logic
+
+### Coverage Requirements
+
+- **Minimum**: 80% coverage for statements, branches, functions, and lines
+- **CI Enforcement**: Coverage thresholds enforced in CI/CD pipeline
+- **Reporting**: Coverage reports uploaded to Codecov on every PR
+
+### Testing Patterns
+
+1. **Use Custom Render**: Import `renderWithProviders` from `test-utils/render` for components that need context
+2. **Mock Supabase**: Use MSW handlers in `mocks/handlers/` for API mocking
+3. **Test User Behavior**: Focus on user interactions, not implementation details
+4. **Fixtures**: Use test data from `test-utils/fixtures/` for consistent test data
+5. **Assertions**: Use React Native Testing Library queries and jest-native matchers
+
+### Test Templates
+
+Use pre-built templates from `docs/templates/`:
+
+- `component.test.template.tsx` - Component testing
+- `hook.test.template.ts` - Custom hook testing
+- `integration.test.template.tsx` - Integration testing
+- `maestro-flow.template.yaml` - E2E flow testing
+
+### Running Tests
+
+```bash
+# Unit tests
+pnpm test              # Run all tests
+pnpm test:watch        # Watch mode for development
+pnpm test -- --coverage # Generate coverage report
+
+# E2E tests
+pnpm maestro           # Run all Maestro flows
+pnpm maestro:record    # Record new flow interactively
+```
+
+### E2E Testing
+
+- **Maestro Flows**: Add E2E tests for critical user journeys
+- **Test IDs**: Add `testID` props to components for reliable E2E selection
+- **Documentation**: Document test scenarios in `.maestro/README.md`
+
+For comprehensive testing guide, see [docs/TESTING.md](docs/TESTING.md).
 
 ## Platform Considerations
 
