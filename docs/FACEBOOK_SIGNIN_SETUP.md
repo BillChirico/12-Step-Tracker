@@ -55,7 +55,7 @@ The Facebook Sign In integration supports:
 
 1. Go to Settings → Basic → iOS
 2. Add:
-   - **Bundle ID**: `com.billchirico.sobrietywaypoint`
+   - **Bundle ID**: `com.volvoxllc.sobrietywaypoint`
    - Enable "Single Sign On"
 3. Save changes
 
@@ -63,7 +63,7 @@ The Facebook Sign In integration supports:
 
 1. Go to Settings → Basic → Android
 2. Add:
-   - **Package Name**: `com.billchirico.sobrietywaypoint`
+   - **Package Name**: `com.volvoxllc.sobrietywaypoint`
    - **Class Name**: Leave default or use your main activity
    - **Key Hashes**: Generate and add your development/production key hashes
 3. Save changes
