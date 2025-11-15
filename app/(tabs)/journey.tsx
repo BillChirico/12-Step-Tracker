@@ -57,7 +57,8 @@ export default function JourneyScreen() {
   useFocusEffect(
     useCallback(() => {
       fetchTimelineData();
-    }, [fetchTimelineData])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
   );
 
   const fetchTimelineData = useCallback(async () => {

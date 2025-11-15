@@ -18,7 +18,8 @@ export default function StepsScreen() {
   useEffect(() => {
     fetchSteps();
     fetchProgress();
-  }, [profile, fetchProgress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   const fetchSteps = async () => {
     try {

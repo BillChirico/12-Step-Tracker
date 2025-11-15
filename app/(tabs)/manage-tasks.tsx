@@ -28,7 +28,8 @@ export default function ManageTasksScreen() {
 
   useEffect(() => {
     fetchData();
-  }, [profile, fetchData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   const fetchData = useCallback(async () => {
     if (!profile) return;
