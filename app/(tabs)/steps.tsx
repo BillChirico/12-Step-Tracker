@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { StepContent, UserStepProgress } from '@/types/database';
-import { BookOpen, X, CheckCircle, Circle } from 'lucide-react-native';
+import { X, CheckCircle, Circle } from 'lucide-react-native';
 
 export default function StepsScreen() {
   const { theme } = useTheme();
@@ -18,7 +18,7 @@ export default function StepsScreen() {
   useEffect(() => {
     fetchSteps();
     fetchProgress();
-  }, [profile]);
+  }, [profile, fetchProgress]);
 
   const fetchSteps = async () => {
     try {
@@ -44,7 +44,7 @@ export default function StepsScreen() {
     }
   };
 
-  const fetchProgress = async () => {
+  const fetchProgress = useCallback(async () => {
     if (!profile) return;
 
     try {
@@ -65,7 +65,7 @@ export default function StepsScreen() {
     } catch (err) {
       console.error('Exception fetching progress:', err);
     }
-  };
+  }, [profile]);
 
   const toggleStepCompletion = async (stepNumber: number) => {
     if (!profile) return;

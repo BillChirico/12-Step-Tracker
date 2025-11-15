@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -165,7 +165,7 @@ export default function ProfileScreen() {
     [key: string]: { total: number; completed: number };
   }>({});
 
-  const fetchRelationships = async () => {
+  const fetchRelationships = useCallback(async () => {
     if (!profile) return;
 
     setLoadingRelationships(true);
@@ -210,11 +210,11 @@ export default function ProfileScreen() {
     } finally {
       setLoadingRelationships(false);
     }
-  };
+  }, [profile]);
 
   useEffect(() => {
     fetchRelationships();
-  }, [profile]);
+  }, [profile, fetchRelationships]);
 
   // Use hook for current user's days sober
   const {
